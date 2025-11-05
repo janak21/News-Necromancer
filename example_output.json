@@ -1,0 +1,39 @@
+{
+  "timestamp": "2024-11-05T14:30:00.000000",
+  "feeds_processed": 2,
+  "total_articles_haunted": 6,
+  "horror_themes_used": [
+    "ancient curses",
+    "vengeful spirits", 
+    "ghostly apparitions",
+    "supernatural forces",
+    "haunted locations",
+    "cursed objects"
+  ],
+  "feeds": [
+    {
+      "source_url": "https://rss.cnn.com/rss/edition.rss",
+      "source_title": "CNN.com",
+      "article_count": 3,
+      "haunted_articles": [
+        {
+          "original": {
+            "title": "Stock Market Reaches Record High",
+            "summary": "Markets surge as investors show confidence...",
+            "link": "https://cnn.com/business/stock-market",
+            "published": "Tue, 05 Nov 2024 12:00:00 GMT",
+            "source": "CNN.com"
+          },
+          "haunted": {
+            "haunted_title": "Cursed Gold: Ancient Spirits Drive Market to Unholy Heights",
+            "haunted_summary": "The spectral hands of long-dead financiers seem to guide today's trading as markets reach supernatural peaks. Witnesses report ghostly figures in the trading floors, their ethereal whispers driving investors toward decisions that defy mortal logic. The surge appears linked to an ancient curse placed upon Wall Street's foundations, where Native burial grounds once lay undisturbed...",
+            "horror_themes": ["vengeful spirits", "ancient curses", "ghostly apparitions"],
+            "supernatural_explanation": "The restless souls of those who died in financial ruin have returned to manipulate the markets from beyond the grave."
+          },
+          "transformation_timestamp": "2024-11-05T14:30:15.123456"
+        }
+      ]
+    }
+  ],
+  "collective_horror_narrative": "In the shadows between worlds, an ancient malevolence stirs. The recent surge in supernatural activity across global news outlets suggests something far more sinister than coincidence. From the ghostly manipulations of financial markets to the cursed political upheavals, a pattern emerges that chills the soul. The veil between our world and the realm of the dead grows thin, and the spirits of the past are reaching through to reshape our reality according to their dark designs..."
+}
