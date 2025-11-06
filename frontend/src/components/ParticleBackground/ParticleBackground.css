@@ -1,0 +1,152 @@
+/* Particle Background Component Styles */
+
+.particle-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.particle-background__particle {
+  position: absolute;
+  background: var(--color-ghost);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color-glow);
+  filter: blur(0.5px);
+}
+
+.particle-background__mist {
+  position: absolute;
+  width: 300px;
+  height: 100px;
+  background: radial-gradient(
+    ellipse,
+    var(--color-mist) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+/* Atmospheric overlay gradients */
+.particle-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(
+      circle at 20% 30%,
+      var(--color-mist) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      var(--color-mist) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(139, 92, 246, 0.05) 0%,
+      transparent 60%
+    );
+  animation: atmosphericShift 30s ease-in-out infinite;
+}
+
+@keyframes atmosphericShift {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    opacity: 0.5;
+    transform: scale(1.1) rotate(1deg);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.9) rotate(-1deg);
+  }
+  75% {
+    opacity: 0.6;
+    transform: scale(1.05) rotate(0.5deg);
+  }
+}
+
+/* Subtle vignette effect */
+.particle-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.1) 80%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  pointer-events: none;
+}
+
+/* Performance optimizations */
+.particle-background * {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .particle-background__particle,
+  .particle-background__mist,
+  .particle-background::before {
+    animation: none !important;
+  }
+  
+  .particle-background__particle {
+    opacity: 0.1 !important;
+  }
+  
+  .particle-background__mist {
+    display: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .particle-background {
+    display: none;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .particle-background__mist {
+    width: 200px;
+    height: 60px;
+  }
+  
+  .particle-background::before {
+    animation-duration: 20s;
+  }
+}
+
+/* Low-end device optimizations */
+@media (max-width: 480px) {
+  .particle-background__particle {
+    filter: none;
+    box-shadow: none;
+  }
+  
+  .particle-background__mist {
+    filter: blur(10px);
+  }
+}

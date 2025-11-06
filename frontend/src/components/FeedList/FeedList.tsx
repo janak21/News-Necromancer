@@ -1,0 +1,366 @@
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import SpookyCard from '../SpookyCard/SpookyCard';
+import type { SpookyVariant, SpookyFeed } from '../../types';
+import './FeedList.css';
+
+export interface FeedListProps {
+  feeds: SpookyFeed[];
+  onVariantSelect?: (variant: SpookyVariant) => void;
+  showFilters?: boolean;
+  compactView?: boolean;
+  maxItemsPerFeed?: number;
+}
+
+type SortOption = 'newest' | 'oldest' | 'source' | 'themes';
+type FilterOption = 'all' | 'personalized' | 'recent';
+
+const FeedList: React.FC<FeedListProps> = ({
+  feeds,
+  onVariantSelect,
+  showFilters = true,
+  compactView = false,
+  maxItemsPerFeed = 5
+}) => {
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [filterBy, setFilterBy] = useState<FilterOption>('all');
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Extract all unique themes from variants
+  const allThemes = useMemo(() => {
+    const themes = new Set<string>();
+    feeds.forEach(feed => {
+      feed.variants.forEach(variant => {
+        variant.horror_themes.forEach(theme => themes.add(theme));
+      });
+    });
+    return Array.from(themes).sort();
+  }, [feeds]);
+
+  // Get all variants from all feeds
+  const allVariants = useMemo(() => {
+    const variants: SpookyVariant[] = [];
+    feeds.forEach(feed => {
+      const feedVariants = feed.variants.slice(0, maxItemsPerFeed);
+      variants.push(...feedVariants);
+    });
+    return variants;
+  }, [feeds, maxItemsPerFeed]);
+
+  // Filter and sort variants
+  const filteredAndSortedVariants = useMemo(() => {
+    let filtered = allVariants;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(variant =>
+        variant.haunted_title.toLowerCase().includes(query) ||
+        variant.haunted_summary.toLowerCase().includes(query) ||
+        variant.original_item.source.toLowerCase().includes(query) ||
+        variant.horror_themes.some(theme => theme.toLowerCase().includes(query))
+      );
+    }
+
+    // Apply filter
+    switch (filterBy) {
+      case 'personalized':
+        filtered = filtered.filter(variant => variant.personalization_applied);
+        break;
+      case 'recent':
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        filtered = filtered.filter(variant => 
+          new Date(variant.generation_timestamp) > oneDayAgo
+        );
+        break;
+      default:
+        // 'all' - no additional filtering
+        break;
+    }
+
+    // Apply theme filter
+    if (selectedThemes.length > 0) {
+      filtered = filtered.filter(variant =>
+        variant.horror_themes.some(theme => selectedThemes.includes(theme))
+      );
+    }
+
+    // Sort variants
+    switch (sortBy) {
+      case 'newest':
+        filtered.sort((a, b) => 
+          new Date(b.original_item.published).getTime() - 
+          new Date(a.original_item.published).getTime()
+        );
+        break;
+      case 'oldest':
+        filtered.sort((a, b) => 
+          new Date(a.original_item.published).getTime() - 
+          new Date(b.original_item.published).getTime()
+        );
+        break;
+      case 'source':
+        filtered.sort((a, b) => 
+          a.original_item.source.localeCompare(b.original_item.source)
+        );
+        break;
+      case 'themes':
+        filtered.sort((a, b) => 
+          a.horror_themes.length - b.horror_themes.length
+        );
+        break;
+    }
+
+    return filtered;
+  }, [allVariants, sortBy, filterBy, selectedThemes, searchQuery]);
+
+  const handleThemeToggle = (theme: string) => {
+    setSelectedThemes(prev => 
+      prev.includes(theme)
+        ? prev.filter(t => t !== theme)
+        : [...prev, theme]
+    );
+  };
+
+  const clearFilters = () => {
+    setFilterBy('all');
+    setSelectedThemes([]);
+    setSearchQuery('');
+    setSortBy('newest');
+  };
+
+
+
+  if (feeds.length === 0) {
+    return (
+      <motion.div 
+        className="feed-list feed-list--empty"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.div 
+          className="feed-list__empty-state"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
+        >
+          <motion.span 
+            className="feed-list__empty-icon"
+            animate={{ 
+              rotate: [0, -10, 10, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 3
+            }}
+          >
+            👻
+          </motion.span>
+          <motion.h3 
+            className="feed-list__empty-title"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
+            No Spooky Content Yet
+          </motion.h3>
+          <motion.p 
+            className="feed-list__empty-description"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.4 }}
+          >
+            Add some RSS feeds to start generating haunted variants of your favorite content.
+          </motion.p>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div 
+      className={`feed-list ${compactView ? 'feed-list--compact' : ''}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {showFilters && (
+        <motion.div 
+          className="feed-list__controls"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <div className="feed-list__search">
+            <input
+              type="text"
+              placeholder="Search spooky content..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="feed-list__search-input"
+            />
+          </div>
+
+          <div className="feed-list__filters">
+            <div className="feed-list__filter-group">
+              <label className="feed-list__filter-label">Sort by:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="feed-list__filter-select"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="source">Source</option>
+                <option value="themes">Theme Count</option>
+              </select>
+            </div>
+
+            <div className="feed-list__filter-group">
+              <label className="feed-list__filter-label">Filter:</label>
+              <select
+                value={filterBy}
+                onChange={(e) => setFilterBy(e.target.value as FilterOption)}
+                className="feed-list__filter-select"
+              >
+                <option value="all">All Content</option>
+                <option value="personalized">Personalized</option>
+                <option value="recent">Recent (24h)</option>
+              </select>
+            </div>
+
+            {(selectedThemes.length > 0 || searchQuery || filterBy !== 'all' || sortBy !== 'newest') && (
+              <button
+                onClick={clearFilters}
+                className="feed-list__clear-filters"
+                type="button"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+
+          {allThemes.length > 0 && (
+            <div className="feed-list__theme-filters">
+              <span className="feed-list__theme-label">Horror Themes:</span>
+              <div className="feed-list__theme-tags">
+                {allThemes.map(theme => (
+                  <button
+                    key={theme}
+                    onClick={() => handleThemeToggle(theme)}
+                    className={`feed-list__theme-tag ${
+                      selectedThemes.includes(theme) ? 'feed-list__theme-tag--active' : ''
+                    }`}
+                    type="button"
+                  >
+                    {theme}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      <motion.div 
+        className="feed-list__results"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <motion.div 
+          className="feed-list__results-header"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
+          <motion.span 
+            className="feed-list__results-count"
+            key={filteredAndSortedVariants.length}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {filteredAndSortedVariants.length} spooky variant{filteredAndSortedVariants.length !== 1 ? 's' : ''}
+          </motion.span>
+        </motion.div>
+
+        <motion.div 
+          className="feed-list__grid"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredAndSortedVariants.map((variant, index) => (
+              <motion.div
+                key={`${variant.original_item.link}-${index}`}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                layout
+                layoutId={`card-${variant.original_item.link}-${index}`}
+              >
+                <SpookyCard
+                  variant={variant}
+                  onReadMore={onVariantSelect}
+                  compact={compactView}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
+        <AnimatePresence>
+          {filteredAndSortedVariants.length === 0 && (
+            <motion.div 
+              className="feed-list__no-results"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.span 
+                className="feed-list__no-results-icon"
+                animate={{ 
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatDelay: 2
+                }}
+              >
+                🔍
+              </motion.span>
+              <motion.h3 
+                className="feed-list__no-results-title"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+              >
+                No Matching Content
+              </motion.h3>
+              <motion.p 
+                className="feed-list__no-results-description"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.4 }}
+              >
+                Try adjusting your filters or search terms to find more spooky content.
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default FeedList;

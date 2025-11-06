@@ -1,0 +1,251 @@
+/* SpookyCard Component Styles */
+
+.spooky-card-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.spooky-card__glow {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: radial-gradient(
+    circle,
+    var(--color-glow) 0%,
+    transparent 70%
+  );
+  border-radius: var(--radius-lg);
+  z-index: -1;
+  opacity: 0;
+}
+
+.spooky-content-card {
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.spooky-content-card--compact {
+  padding: var(--spacing-sm);
+}
+
+.spooky-content-card--compact .spooky-content-card__title {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xs);
+}
+
+.spooky-content-card--compact .spooky-content-card__summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Header */
+.spooky-content-card__header {
+  margin-bottom: var(--spacing-md);
+}
+
+.spooky-content-card__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: var(--line-height-tight);
+  text-shadow: 0 0 10px var(--color-glow);
+  transition: text-shadow var(--transition-normal);
+  cursor: default;
+}
+
+.spooky-content-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.spooky-content-card__source {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+}
+
+.spooky-content-card__date {
+  opacity: 0.8;
+}
+
+/* Body */
+.spooky-content-card__body {
+  margin-bottom: var(--spacing-lg);
+}
+
+.spooky-content-card__summary {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.spooky-content-card__explanation {
+  background: var(--color-mist);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  border-left: 3px solid var(--color-primary);
+}
+
+.spooky-content-card__explanation-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color var(--transition-fast);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.spooky-content-card__explanation-text {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Themes */
+.spooky-content-card__themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-md);
+}
+
+.spooky-content-card__theme-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  text-transform: capitalize;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  will-change: transform;
+}
+
+.spooky-content-card__theme-tag:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Footer */
+.spooky-content-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-surface-elevated);
+}
+
+.spooky-content-card__indicators {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.spooky-content-card__personalized {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  user-select: none;
+}
+
+.spooky-content-card__generated {
+  opacity: 0.7;
+}
+
+.spooky-content-card__read-more {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: var(--color-text);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  will-change: transform, box-shadow;
+}
+
+.spooky-content-card__read-more:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+  filter: brightness(1.1);
+}
+
+.spooky-content-card__read-more:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .spooky-content-card__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .spooky-content-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .spooky-content-card__read-more {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .spooky-content-card__themes {
+    justify-content: flex-start;
+  }
+}
+
+/* Compact variant responsive adjustments */
+@media (max-width: 640px) {
+  .spooky-content-card--compact {
+    padding: calc(var(--spacing-sm) * 0.75);
+  }
+  
+  .spooky-content-card--compact .spooky-content-card__title {
+    font-size: var(--font-size-sm);
+  }
+  
+  .spooky-content-card--compact .spooky-content-card__themes {
+    margin-top: var(--spacing-sm);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .spooky-content-card__theme-tag:hover {
+    transform: none;
+  }
+  
+  .spooky-content-card__read-more:hover {
+    transform: none;
+  }
+}

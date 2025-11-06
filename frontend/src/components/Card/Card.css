@@ -1,0 +1,204 @@
+/* Spooky Card Component Styles */
+
+.spooky-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+  overflow: hidden;
+}
+
+/* Padding Variants */
+.spooky-card--padding-none {
+  padding: 0;
+}
+
+.spooky-card--padding-sm {
+  padding: var(--spacing-sm);
+}
+
+.spooky-card--padding-md {
+  padding: var(--spacing-md);
+}
+
+.spooky-card--padding-lg {
+  padding: var(--spacing-lg);
+}
+
+/* Style Variants */
+.spooky-card--default {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-surface-elevated);
+  box-shadow: var(--shadow-sm);
+}
+
+.spooky-card--elevated {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-surface-elevated);
+  box-shadow: var(--shadow-lg);
+}
+
+.spooky-card--outlined {
+  background-color: transparent;
+  border: 1px solid var(--color-surface-elevated);
+  box-shadow: none;
+}
+
+.spooky-card--ghost {
+  background-color: var(--color-mist);
+  border: 1px solid transparent;
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Hover Effects */
+.spooky-card--hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-primary);
+}
+
+.spooky-card--hover:hover.spooky-card--outlined {
+  background-color: var(--color-mist);
+}
+
+.spooky-card--hover:hover.spooky-card--ghost {
+  background-color: var(--color-surface);
+  border-color: var(--color-primary);
+}
+
+/* Glow Effect */
+.spooky-card--glow {
+  position: relative;
+}
+
+.spooky-card--glow::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    var(--color-primary),
+    var(--color-secondary),
+    var(--color-accent),
+    var(--color-primary)
+  );
+  border-radius: var(--radius-lg);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  animation: glow-rotate 3s linear infinite;
+}
+
+.spooky-card--glow:hover::before {
+  opacity: 0.7;
+}
+
+@keyframes glow-rotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Card Header */
+.spooky-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-surface-elevated);
+}
+
+.spooky-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.spooky-card__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  margin-top: var(--spacing-xs);
+}
+
+/* Card Body */
+.spooky-card__body {
+  color: var(--color-text);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Card Footer */
+.spooky-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-surface-elevated);
+}
+
+/* Card Actions */
+.spooky-card__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .spooky-card--padding-sm {
+    padding: calc(var(--spacing-sm) * 0.75);
+  }
+  
+  .spooky-card--padding-md {
+    padding: calc(var(--spacing-md) * 0.75);
+  }
+  
+  .spooky-card--padding-lg {
+    padding: calc(var(--spacing-lg) * 0.75);
+  }
+  
+  .spooky-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .spooky-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .spooky-card__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .spooky-card {
+    transition: none;
+  }
+  
+  .spooky-card--hover:hover {
+    transform: none;
+  }
+  
+  .spooky-card--glow::before {
+    animation: none;
+  }
+}

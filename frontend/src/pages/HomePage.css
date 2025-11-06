@@ -1,0 +1,115 @@
+.homepage-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.homepage-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  animation: heroGlow 20s ease-in-out infinite;
+}
+
+@keyframes heroGlow {
+  0%, 100% { opacity: 0.3; transform: rotate(0deg); }
+  50% { opacity: 0.6; transform: rotate(1deg); }
+}
+
+.feature-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(138, 43, 226, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.feature-card:hover::before {
+  left: 100%;
+}
+
+.rotating-facts {
+  position: relative;
+  overflow: hidden;
+}
+
+.rotating-facts::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(138, 43, 226, 0.05), rgba(75, 0, 130, 0.05));
+  border-radius: inherit;
+  animation: factGlow 3s ease-in-out infinite;
+}
+
+@keyframes factGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.demo-examples {
+  position: relative;
+}
+
+.demo-examples::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(138, 43, 226, 0.1), transparent);
+  animation: demoSpin 30s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes demoSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.action-buttons button {
+  position: relative;
+  overflow: hidden;
+}
+
+.action-buttons button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.action-buttons button:hover::before {
+  width: 300px;
+  height: 300px;
+}

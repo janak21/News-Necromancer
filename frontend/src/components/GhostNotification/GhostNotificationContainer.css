@@ -1,0 +1,45 @@
+/* Ghost Notification Container Styles */
+
+.ghost-notification-container {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  pointer-events: none;
+  max-width: 400px;
+  width: 100%;
+}
+
+.ghost-notification-container > * {
+  pointer-events: auto;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .ghost-notification-container {
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    left: var(--spacing-md);
+    max-width: none;
+  }
+}
+
+/* Stacking animation for multiple notifications */
+.ghost-notification-container .ghost-notification:nth-child(n+2) {
+  margin-top: calc(var(--spacing-sm) * -0.5);
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.ghost-notification-container .ghost-notification:nth-child(n+3) {
+  margin-top: calc(var(--spacing-sm) * -1);
+  transform: scale(0.9);
+  opacity: 0.6;
+}
+
+.ghost-notification-container .ghost-notification:nth-child(n+4) {
+  display: none;
+}

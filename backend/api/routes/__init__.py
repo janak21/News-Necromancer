@@ -1,0 +1,7 @@
+"""
+API Routes for the Spooky RSS System
+"""
+
+from . import feeds, health, preferences
+
+__all__ = ["feeds", "health", "preferences"]

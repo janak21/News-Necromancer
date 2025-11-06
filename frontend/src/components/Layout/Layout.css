@@ -1,0 +1,281 @@
+/* Spooky Layout Component Styles */
+
+/* Base Layout */
+.spooky-layout {
+  width: 100%;
+}
+
+/* Layout Variants */
+.spooky-layout--container {
+  margin: 0 auto;
+}
+
+.spooky-layout--full {
+  width: 100%;
+  margin: 0;
+}
+
+.spooky-layout--centered {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Max Width Variants */
+.spooky-layout--max-sm {
+  max-width: 640px;
+}
+
+.spooky-layout--max-md {
+  max-width: 768px;
+}
+
+.spooky-layout--max-lg {
+  max-width: 1024px;
+}
+
+.spooky-layout--max-xl {
+  max-width: 1280px;
+}
+
+.spooky-layout--max-2xl {
+  max-width: 1536px;
+}
+
+.spooky-layout--max-full {
+  max-width: none;
+}
+
+/* Padding Variants */
+.spooky-layout--padding-none {
+  padding: 0;
+}
+
+.spooky-layout--padding-sm {
+  padding: var(--spacing-sm);
+}
+
+.spooky-layout--padding-md {
+  padding: var(--spacing-md);
+}
+
+.spooky-layout--padding-lg {
+  padding: var(--spacing-lg);
+}
+
+/* Grid System */
+.spooky-grid {
+  display: grid;
+  width: 100%;
+}
+
+.spooky-grid--cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.spooky-grid--cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.spooky-grid--cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.spooky-grid--cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.spooky-grid--cols-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.spooky-grid--cols-12 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+/* Grid Gaps */
+.spooky-grid--gap-none {
+  gap: 0;
+}
+
+.spooky-grid--gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.spooky-grid--gap-md {
+  gap: var(--spacing-md);
+}
+
+.spooky-grid--gap-lg {
+  gap: var(--spacing-lg);
+}
+
+.spooky-grid--gap-xl {
+  gap: var(--spacing-xl);
+}
+
+/* Responsive Grid */
+.spooky-grid--responsive.spooky-grid--cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.spooky-grid--responsive.spooky-grid--cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.spooky-grid--responsive.spooky-grid--cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.spooky-grid--responsive.spooky-grid--cols-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.spooky-grid--responsive.spooky-grid--cols-12 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+/* Flex System */
+.spooky-flex {
+  display: flex;
+}
+
+/* Flex Direction */
+.spooky-flex--row {
+  flex-direction: row;
+}
+
+.spooky-flex--column {
+  flex-direction: column;
+}
+
+/* Flex Align */
+.spooky-flex--align-start {
+  align-items: flex-start;
+}
+
+.spooky-flex--align-center {
+  align-items: center;
+}
+
+.spooky-flex--align-end {
+  align-items: flex-end;
+}
+
+.spooky-flex--align-stretch {
+  align-items: stretch;
+}
+
+/* Flex Justify */
+.spooky-flex--justify-start {
+  justify-content: flex-start;
+}
+
+.spooky-flex--justify-center {
+  justify-content: center;
+}
+
+.spooky-flex--justify-end {
+  justify-content: flex-end;
+}
+
+.spooky-flex--justify-between {
+  justify-content: space-between;
+}
+
+.spooky-flex--justify-around {
+  justify-content: space-around;
+}
+
+.spooky-flex--justify-evenly {
+  justify-content: space-evenly;
+}
+
+/* Flex Wrap */
+.spooky-flex--wrap {
+  flex-wrap: wrap;
+}
+
+/* Flex Gaps */
+.spooky-flex--gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.spooky-flex--gap-md {
+  gap: var(--spacing-md);
+}
+
+.spooky-flex--gap-lg {
+  gap: var(--spacing-lg);
+}
+
+.spooky-flex--gap-xl {
+  gap: var(--spacing-xl);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .spooky-grid--responsive.spooky-grid--cols-6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  
+  .spooky-grid--responsive.spooky-grid--cols-12 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .spooky-layout--padding-sm {
+    padding: calc(var(--spacing-sm) * 0.75);
+  }
+  
+  .spooky-layout--padding-md {
+    padding: calc(var(--spacing-md) * 0.75);
+  }
+  
+  .spooky-layout--padding-lg {
+    padding: calc(var(--spacing-lg) * 0.75);
+  }
+  
+  .spooky-grid--responsive.spooky-grid--cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .spooky-grid--responsive.spooky-grid--cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .spooky-grid--responsive.spooky-grid--cols-6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .spooky-grid--responsive.spooky-grid--cols-12 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .spooky-grid--responsive.spooky-grid--cols-2,
+  .spooky-grid--responsive.spooky-grid--cols-3,
+  .spooky-grid--responsive.spooky-grid--cols-4,
+  .spooky-grid--responsive.spooky-grid--cols-6 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .spooky-grid--responsive.spooky-grid--cols-12 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .spooky-flex--row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .spooky-grid--responsive.spooky-grid--cols-12 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}

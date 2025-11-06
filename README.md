@@ -1,125 +1,183 @@
-# Haunted RSS Parser 👻🎃
+# Spooky RSS System 👻🎃
 
-A Python RSS parser that fetches news feeds and transforms them into supernatural horror stories with ghosts, curses, and otherworldly themes using OpenAI's GPT.
+A full-stack application that transforms ordinary RSS news feeds into supernatural horror stories. Built with Python FastAPI backend and React TypeScript frontend, featuring real-time feed processing and spooky transformations using AI.
 
 ## Features
 
-- Fetches RSS feeds from multiple URLs
-- Transforms each article into haunted versions with horror themes
-- Includes specific supernatural elements: ghosts, curses, haunted locations, vengeful spirits
-- Outputs structured JSON with both original and haunted versions
-- Creates collective horror narratives connecting all stories
-- Tracks horror themes used across all transformations
+### Backend (Python FastAPI)
+- 🕷️ Concurrent RSS feed fetching with error handling
+- 🧙‍♂️ AI-powered horror story transformation using OpenRouter
+- 👻 Automatic "ghost article" generation for failed feeds
+- 🔮 RESTful API with comprehensive error handling
+- 📊 Performance tracking and logging
 
-## Setup
+### Frontend (React TypeScript)
+- 🎃 Modern, responsive horror-themed UI
+- 🌙 Dark theme with particle effects
+- 📱 Mobile-friendly design
+- ⚡ Real-time feed processing
+- 🎭 Interactive preferences panel
+- 👻 Animated ghost notifications
 
-1. Install dependencies:
+### Horror Transformation
+- 🏚️ Multiple horror themes: Gothic, Supernatural, Cosmic, etc.
+- 🎪 Customizable intensity levels
+- 🔗 Collective narratives connecting all stories
+- 🎨 Rich horror vocabulary and atmospheric descriptions
+
+## Quick Start
+
+### Prerequisites
+- Python 3.11+ (3.13 compatible)
+- Node.js 18+
+- OpenRouter API key
+
+### Backend Setup
 ```bash
+# Clone the repository
+git clone https://github.com/yourusername/spooky-rss-system.git
+cd spooky-rss-system
+
+# Set up Python environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-```
 
-**✅ Python 3.13 Compatible**: All dependencies updated for full Python 3.13 support.
-
-2. Set up your OpenRouter API key:
-```bash
+# Configure environment
 cp .env.example .env
-# Edit .env and add your OpenRouter API key and preferred model
+# Edit .env and add your OpenRouter API key
+
+# Run the backend
+python run_backend.py
 ```
 
-3. Run the parser:
+### Frontend Setup
 ```bash
-python rss_spooky_parser.py
+cd frontend
+npm install
+npm run dev
 ```
 
-## Usage
+### Access the Application
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- API Documentation: http://localhost:8000/docs
 
-### Basic Usage
-```python
-from backend.rss_spooky_parser import SpookyRSSParser
+## Project Structure
 
-# Use default model from .env
-parser = SpookyRSSParser()
-
-# Or specify a model directly
-parser = SpookyRSSParser(model="gpt-4")
-parser = SpookyRSSParser(model="anthropic/claude-3-sonnet")
-
-articles = parser.fetch_rss_feed("https://rss.cnn.com/rss/edition.rss")
-haunted = parser.create_haunted_article(articles[0])
-print(haunted['haunted']['haunted_title'])
+```
+spooky-rss-system/
+├── backend/                 # Python FastAPI backend
+│   ├── api/                # API routes and middleware
+│   ├── config/             # Configuration management
+│   ├── fetcher/            # RSS feed fetching logic
+│   ├── models/             # Data models and schemas
+│   └── remixer/            # Horror transformation engine
+├── frontend/               # React TypeScript frontend
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Application pages
+│   │   ├── services/       # API communication
+│   │   └── hooks/          # Custom React hooks
+│   └── public/             # Static assets
+├── logs/                   # Application logs
+├── requirements.txt        # Python dependencies
+└── run_backend.py         # Backend entry point
 ```
 
-### Process Multiple Feeds
-```python
-urls = [
-    "https://rss.cnn.com/rss/edition.rss",
-    "https://feeds.bbci.co.uk/news/rss.xml"
-]
-results = parser.process_feeds(urls)
-parser.save_results(results)
+## API Usage
+
+### Process RSS Feeds
+```bash
+curl -X POST "http://localhost:8000/api/feeds/process" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "urls": ["https://rss.cnn.com/rss/edition.rss"],
+    "variant_count": 3,
+    "preferences": {
+      "preferred_horror_types": ["GOTHIC", "SUPERNATURAL"],
+      "intensity_level": 3
+    }
+  }'
 ```
 
-## Error Handling & Resurrection
+### Health Check
+```bash
+curl http://localhost:8000/api/health
+```
 
-The parser includes robust error handling with spooky themed messages:
+## Horror Transformation Features
 
+### Intelligent Error Handling
 - **Dead Feed Resurrection**: 3 automatic retry attempts with exponential backoff
-- **Resurrection Messages**: Random spooky messages during retry attempts
-- **Ghost Articles**: Creates supernatural placeholder content for permanently dead feeds
-- **Performance Tracking**: Detailed stats on execution time and success rates
+- **Ghost Articles**: Creates supernatural placeholder content for failed feeds
+- **Spooky Error Messages**: Themed error handling throughout the system
 
-### Resurrection Messages
-- "🧟‍♂️ Attempting necromantic resurrection of dead feed..."
-- "⚰️ Summoning spirits to revive the silent RSS..."
-- "🔮 Channeling dark magic to awaken dormant feed..."
+### Horror Themes Available
+- **Gothic**: Dark castles, ancient curses, mysterious fog
+- **Supernatural**: Ghosts, spirits, otherworldly phenomena  
+- **Cosmic**: Eldritch horrors, unknown dimensions, cosmic dread
+- **Psychological**: Mind-bending terror, reality distortion
+- **Body Horror**: Grotesque transformations, biological nightmares
 
-## Model Selection
+## Configuration
 
-OpenRouter gives you access to multiple AI models:
+### Environment Variables
+```bash
+# Required
+OPENROUTER_API_KEY=your-api-key-here
 
-### Popular Models
+# Optional
+OPENROUTER_MODEL=gpt-3.5-turbo
+HOST=0.0.0.0
+PORT=8000
+MAX_CONCURRENT_FEEDS=10
+LOG_LEVEL=INFO
+```
+
+### Supported AI Models
 - **gpt-3.5-turbo**: Fast and cost-effective
 - **gpt-4**: Higher quality, more creative
 - **anthropic/claude-3-sonnet**: Excellent for creative writing
 - **meta-llama/llama-2-70b-chat**: Open source alternative
 - **mistralai/mistral-7b-instruct**: European AI model
 
-### Usage Examples
-```python
-# Different models for different needs
-parser_fast = SpookyRSSParser(model="gpt-3.5-turbo")      # Speed
-parser_quality = SpookyRSSParser(model="gpt-4")           # Quality  
-parser_creative = SpookyRSSParser(model="anthropic/claude-3-sonnet") # Creativity
+## Development
+
+### Running Tests
+```bash
+# Backend tests
+python -m pytest
+
+# Frontend tests  
+cd frontend
+npm test
 ```
 
-See `model_examples.py` for testing different models.
+### Development Mode
+```bash
+# Backend with auto-reload
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 
-## Configuration
+# Frontend with hot reload
+cd frontend
+npm run dev
+```
 
-- Set `OPENROUTER_MODEL` in `.env` for default model
-- Modify RSS URLs in the `main()` function
-- Adjust article limit in `fetch_rss_feed()` (default: 5 articles)
-- Customize horror themes in `create_haunted_article()`
-- Set retry attempts in `fetch_rss_feed()` (default: 3)
+## Contributing
 
-## Output Structure
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-The parser generates JSON files with:
-- **Original articles**: Unmodified RSS content
-- **Haunted versions**: Horror-themed transformations with:
-  - Haunted titles and summaries
-  - Horror themes used (ghosts, curses, etc.)
-  - Supernatural explanations
-- **Collective horror narrative**: Overarching story connecting all events
-- **Horror theme tracking**: Complete list of supernatural elements used
+## License
 
-See `example_output.json` for the complete structure.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Horror Themes Included
+## Acknowledgments
 
-- Ancient curses and dark omens
-- Vengeful spirits and ghostly apparitions  
-- Haunted locations and cursed objects
-- Supernatural forces and otherworldly interventions
-- Demonic influences and restless souls
-- Spectral warnings and malevolent entities
+- Built with [FastAPI](https://fastapi.tiangolo.com/) and [React](https://reactjs.org/)
+- AI transformations powered by [OpenRouter](https://openrouter.ai/)
+- Horror themes inspired by classic supernatural literature

@@ -1,0 +1,226 @@
+/* Ghost Notification Component Styles */
+
+.ghost-notification {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: var(--z-toast);
+  cursor: pointer;
+  user-select: none;
+  max-width: 320px;
+  min-width: 280px;
+}
+
+.ghost-notification__glow {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(
+    circle,
+    var(--color-glow) 0%,
+    transparent 70%
+  );
+  border-radius: var(--radius-xl);
+  z-index: -1;
+}
+
+.ghost-notification__body {
+  position: relative;
+  background: var(--color-surface-elevated);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.ghost-notification__body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.1) 0%,
+    transparent 50%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
+  pointer-events: none;
+}
+
+.ghost-notification__face {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.ghost-notification__eyes {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.ghost-notification__eye {
+  width: 8px;
+  height: 12px;
+  background: var(--color-ghost);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-glow);
+}
+
+.ghost-notification__mouth {
+  width: 12px;
+  height: 8px;
+  background: var(--color-ghost);
+  border-radius: 0 0 50% 50%;
+  margin-left: var(--spacing-xs);
+  box-shadow: 0 0 6px var(--color-glow);
+}
+
+.ghost-notification__content {
+  position: relative;
+  z-index: 1;
+}
+
+.ghost-notification__message {
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  margin: 0;
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+.ghost-notification__particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ghost-notification__particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--color-ghost);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color-glow);
+}
+
+.ghost-notification__particle:nth-child(1) { top: 20%; left: 15%; }
+.ghost-notification__particle:nth-child(2) { top: 30%; right: 20%; }
+.ghost-notification__particle:nth-child(3) { top: 50%; left: 25%; }
+.ghost-notification__particle:nth-child(4) { top: 60%; right: 15%; }
+.ghost-notification__particle:nth-child(5) { top: 75%; left: 35%; }
+.ghost-notification__particle:nth-child(6) { top: 80%; right: 30%; }
+
+/* Type-specific styling */
+.ghost-notification--success {
+  --notification-color: var(--color-success);
+}
+
+.ghost-notification--success .ghost-notification__body {
+  border-color: var(--color-success);
+}
+
+.ghost-notification--success .ghost-notification__glow {
+  background: radial-gradient(
+    circle,
+    rgba(16, 185, 129, 0.3) 0%,
+    transparent 70%
+  );
+}
+
+.ghost-notification--warning {
+  --notification-color: var(--color-warning);
+}
+
+.ghost-notification--warning .ghost-notification__body {
+  border-color: var(--color-warning);
+}
+
+.ghost-notification--warning .ghost-notification__glow {
+  background: radial-gradient(
+    circle,
+    rgba(245, 158, 11, 0.3) 0%,
+    transparent 70%
+  );
+}
+
+.ghost-notification--error {
+  --notification-color: var(--color-danger);
+}
+
+.ghost-notification--error .ghost-notification__body {
+  border-color: var(--color-danger);
+}
+
+.ghost-notification--error .ghost-notification__glow {
+  background: radial-gradient(
+    circle,
+    rgba(239, 68, 68, 0.3) 0%,
+    transparent 70%
+  );
+}
+
+.ghost-notification--error .ghost-notification__mouth {
+  transform: rotate(180deg);
+  margin-top: 4px;
+}
+
+/* Hover effects */
+.ghost-notification:hover .ghost-notification__body {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-normal);
+}
+
+.ghost-notification:hover .ghost-notification__glow {
+  opacity: 1.2;
+}
+
+.ghost-notification:hover .ghost-notification__eyes .ghost-notification__eye {
+  background: var(--color-primary);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .ghost-notification {
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    left: var(--spacing-md);
+    max-width: none;
+    min-width: auto;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .ghost-notification__particle,
+  .ghost-notification__eye,
+  .ghost-notification__glow {
+    animation: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .ghost-notification__body {
+    border-width: 3px;
+    background: var(--color-background);
+  }
+  
+  .ghost-notification__eye,
+  .ghost-notification__mouth,
+  .ghost-notification__particle {
+    background: var(--color-text);
+    box-shadow: none;
+  }
+}
