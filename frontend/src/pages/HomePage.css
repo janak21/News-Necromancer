@@ -28,9 +28,18 @@
   overflow: hidden;
 }
 
+.feature-card--compact {
+  padding: 0.75rem !important;
+}
+
+.feature-card--compact .spooky-card__header,
+.feature-card--compact .spooky-card__body {
+  padding: 0 !important;
+}
+
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3);
 }
 
 .feature-card::before {

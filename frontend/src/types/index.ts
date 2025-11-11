@@ -17,6 +17,15 @@ export interface SpookyVariant {
   supernatural_explanation: string;
   personalization_applied: boolean;
   generation_timestamp: string;
+  variant_id?: string;
+  continuation?: StoryContinuation;
+}
+
+export interface StoryContinuation {
+  variant_id: string;
+  continued_narrative: string;
+  continuation_timestamp: string;
+  maintains_intensity: boolean;
 }
 
 export interface UserPreferences {

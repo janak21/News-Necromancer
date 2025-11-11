@@ -68,6 +68,8 @@ yarn-error.log*
 .pnpm-debug.log*
 .npm
 .eslintcache
+frontend/.env
+frontend/.env.local
 
 # Frontend build
 frontend/dist/
@@ -126,9 +128,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-# Kiro IDE specific
-.kiro/
 
 # Application specific
 example_output.json

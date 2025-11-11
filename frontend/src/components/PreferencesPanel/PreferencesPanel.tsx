@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import useUserPreferences from '../../hooks/useUserPreferences';
+import { useSoundEffects } from '../../hooks';
 import { ApiService } from '../../services/api';
+import IntensitySlider from '../IntensitySlider';
 import type { UserPreferences } from '../../types';
 import './PreferencesPanel.css';
 
@@ -42,8 +44,19 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
   className = ''
 }) => {
   const { preferences, setPreferences, loading, error } = useUserPreferences();
+  const { playSound, stopSound, toggleSound, setVolume, isEnabled, volume } = useSoundEffects();
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isAmbientPlaying, setIsAmbientPlaying] = useState(false);
+
+  // Play ambient sound when enabled
+  useEffect(() => {
+    if (isAmbientPlaying && isEnabled) {
+      playSound('ambient');
+    } else {
+      stopSound('ambient');
+    }
+  }, [isAmbientPlaying, isEnabled, playSound, stopSound]);
 
   const handleHorrorTypeToggle = (horrorTypeValue: string) => {
     const updatedTypes = preferences.preferred_horror_types.includes(horrorTypeValue)
@@ -167,27 +180,11 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
 
         {/* Intensity Level Section */}
         <div className="preference-section">
-          <h3>🌙 Horror Intensity</h3>
-          <p className="preference-section-description">
-            How deeply should darkness penetrate?
-          </p>
-          <div className="intensity-compact">
-            <div className="intensity-labels-compact">
-              <span>Gentle</span>
-              <span>Terror</span>
-            </div>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={preferences.intensity_level}
-              onChange={(e) => handleIntensityChange(parseInt(e.target.value))}
-              className="intensity-slider-compact"
-            />
-            <div className="current-intensity-compact">
-              {getIntensityLabel(preferences.intensity_level)}
-            </div>
-          </div>
+          <IntensitySlider
+            value={preferences.intensity_level}
+            onChange={handleIntensityChange}
+            disabled={saving}
+          />
         </div>
 
         {/* Content Filters Section */}
@@ -235,6 +232,53 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
                 <span>{setting.label}</span>
               </label>
             ))}
+          </div>
+        </div>
+
+        {/* Sound Settings Section */}
+        <div className="preference-section">
+          <h3>🔊 Sound Effects</h3>
+          <p className="preference-section-description">
+            Control the whispers from beyond...
+          </p>
+          <div className="sound-settings-compact">
+            <label className={`sound-toggle-compact ${isEnabled ? 'enabled' : ''}`}>
+              <input
+                type="checkbox"
+                checked={isEnabled}
+                onChange={toggleSound}
+              />
+              <span className="sound-icon">{isEnabled ? '🔊' : '🔇'}</span>
+              <span>Enable Sound Effects</span>
+            </label>
+
+            {isEnabled && (
+              <>
+                <div className="volume-control-compact">
+                  <span className="volume-label">Volume</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={volume}
+                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                    className="volume-slider-compact"
+                  />
+                  <span className="volume-value">{Math.round(volume * 100)}%</span>
+                </div>
+
+                <label className={`ambient-toggle-compact ${isAmbientPlaying ? 'playing' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={isAmbientPlaying}
+                    onChange={() => setIsAmbientPlaying(!isAmbientPlaying)}
+                  />
+                  <span className="ambient-icon">🎵</span>
+                  <span>Ambient Horror Loop</span>
+                </label>
+              </>
+            )}
           </div>
         </div>
       </div>

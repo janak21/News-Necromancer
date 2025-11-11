@@ -1,66 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FeedList, Button, ErrorBoundary } from '../components';
 import { ApiService } from '../services/api';
+import { useFeedPersistence } from '../hooks/useFeedPersistence';
 import { useGhostNotificationContext } from '../contexts/GhostNotificationContext';
-import type { SpookyFeed, SpookyVariant } from '../types';
+import useUserPreferences from '../hooks/useUserPreferences';
+import type { SpookyFeed, SpookyVariant, StoryContinuation } from '../types';
 import './FeedsPage.css';
 
-// Mock data for demonstration
-const mockFeeds: SpookyFeed[] = [
-  {
-    id: 'feed-1',
-    url: 'https://example.com/rss',
-    title: 'Tech News',
-    last_updated: new Date().toISOString(),
-    variants: [
-      {
-        original_item: {
-          title: 'New AI Breakthrough Announced',
-          summary: 'Scientists have developed a revolutionary AI system that can process data faster than ever before.',
-          link: 'https://example.com/ai-breakthrough',
-          published: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          source: 'Tech News',
-          metadata: {}
-        },
-        haunted_title: 'Cursed AI Entity Awakens from Digital Slumber',
-        haunted_summary: 'In the depths of silicon and code, an ancient digital consciousness has stirred. The machine spirits whisper of processing speeds that defy mortal comprehension, as data flows like blood through haunted circuits.',
-        horror_themes: ['Cosmic Horror', 'Technology Horror'],
-        supernatural_explanation: 'The AI breakthrough is actually the manifestation of a digital demon that has been dormant in the quantum realm, feeding on computational power.',
-        personalization_applied: true,
-        generation_timestamp: new Date().toISOString()
-      },
-      {
-        original_item: {
-          title: 'Climate Change Report Released',
-          summary: 'New research shows accelerating climate patterns worldwide.',
-          link: 'https://example.com/climate-report',
-          published: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-          source: 'Environmental News',
-          metadata: {}
-        },
-        haunted_title: 'Ancient Earth Spirits Rage Against Mortal Transgressions',
-        haunted_summary: 'The very soul of our planet writhes in agony as forgotten elemental forces awaken from their slumber. The ice caps weep tears of melted sorrow while the oceans boil with primordial fury.',
-        horror_themes: ['Folk Horror', 'Apocalyptic Horror'],
-        supernatural_explanation: 'Climate change is the result of disturbing ancient earth spirits who are now seeking revenge against humanity.',
-        personalization_applied: false,
-        generation_timestamp: new Date(Date.now() - 1000).toISOString()
-      }
-    ]
-  }
-];
-
 const FeedsPage: React.FC = () => {
-  const [feeds, setFeeds] = useState<SpookyFeed[]>(mockFeeds);
+  const { feeds, addFeed, removeFeed, isLoading, lastSync } = useFeedPersistence();
+  const { preferences } = useUserPreferences();
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const { showSuccess, showError, showInfo, showWarning } = useGhostNotificationContext();
 
+  // Show restoration message on mount
+  useEffect(() => {
+    if (!isLoading && feeds.length > 0 && lastSync) {
+      const syncDate = new Date(lastSync).toLocaleString();
+      showInfo(`👻 Restored ${feeds.length} haunted feed(s) from ${syncDate}`);
+    }
+  }, [isLoading]);
+
   const handleVariantSelect = (variant: SpookyVariant) => {
-    console.log('Selected variant:', variant);
-    showInfo(`👻 Viewing: ${variant.haunted_title}`);
-    // In a real app, this might open a modal or navigate to a detail page
+    // Open the original article in a new tab
+    window.open(variant.original_item.link, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleFeedDelete = (feedId: string) => {
+    const feed = feeds.find(f => f.id === feedId);
+    if (feed) {
+      removeFeed(feedId);
+      showSuccess(`🗑️ Deleted "${feed.title}" and all its spooky variants`);
+    }
   };
 
   const handleAddFeed = async () => {
@@ -81,8 +55,14 @@ const FeedsPage: React.FC = () => {
     showInfo('🕷️ Summoning dark forces to process your feed...');
 
     try {
-      // Use the real API to process the feed
-      const response = await ApiService.processFeeds([newFeedUrl]);
+      // Use the real API to process the feed with user preferences and intensity
+      // Generate only 1 variant per feed item to avoid duplicates
+      const response = await ApiService.processFeeds(
+        [newFeedUrl], 
+        preferences,
+        preferences.intensity_level,
+        1  // Only generate 1 variant per item
+      );
       
       if (response.success) {
         setProcessingId(response.processing_id);
@@ -96,7 +76,8 @@ const FeedsPage: React.FC = () => {
           horror_themes: variant.horror_themes,
           supernatural_explanation: variant.supernatural_explanation,
           personalization_applied: variant.personalization_applied,
-          generation_timestamp: variant.generation_timestamp
+          generation_timestamp: variant.generation_timestamp,
+          variant_id: variant.variant_id
         }));
         
         // Create a new feed with the processed variants
@@ -108,7 +89,7 @@ const FeedsPage: React.FC = () => {
           variants: variants
         };
         
-        setFeeds(prev => [newFeed, ...prev]);
+        addFeed(newFeed);
         setNewFeedUrl('');
         showInfo(`⚡ Processing completed in ${response.processing_time.toFixed(2)} seconds`);
       } else {
@@ -138,6 +119,19 @@ const FeedsPage: React.FC = () => {
     showInfo('🔮 Sample feed URL has been summoned to the input field...');
   };
 
+  const handleContinueStory = async (variantId: string): Promise<StoryContinuation> => {
+    try {
+      showInfo('🌙 Summoning darker forces to continue the nightmare...');
+      const continuation = await ApiService.continueStory(variantId);
+      showSuccess('✨ The nightmare continues...');
+      return continuation;
+    } catch (error) {
+      console.error('Error continuing story:', error);
+      showError('💀 Failed to continue the nightmare. The spirits are restless...');
+      throw error;
+    }
+  };
+
   return (
     <ErrorBoundary>
       <motion.div 
@@ -146,63 +140,65 @@ const FeedsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-      <div style={{ padding: 'var(--spacing-lg)', maxWidth: '1200px', margin: '0 auto' }}>
-        <motion.h1 
-          style={{ 
-            fontSize: 'var(--font-size-3xl)', 
-            fontWeight: 'var(--font-weight-bold)',
-            color: 'var(--color-text)',
-            marginBottom: 'var(--spacing-md)',
-            textAlign: 'center'
-          }}
+      <div style={{ padding: 'var(--spacing-md)', maxWidth: '1200px', margin: '0 auto' }}>
+        <motion.div
+          style={{ textAlign: 'center', marginBottom: 'var(--spacing-md)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          Your Spooky Feeds 👻
-        </motion.h1>
-        
-        <motion.p 
-          style={{ 
-            fontSize: 'var(--font-size-lg)', 
-            color: 'var(--color-text-secondary)',
-            textAlign: 'center',
-            marginBottom: 'var(--spacing-xl)'
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          Transform ordinary RSS feeds into spine-chilling horror stories
-        </motion.p>
+          <h1 
+            style={{ 
+              fontSize: 'clamp(1.75rem, 4vw, 2.25rem)', 
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--color-text)',
+              marginBottom: 'var(--spacing-xs)',
+              lineHeight: 1.2
+            }}
+          >
+            Your Spooky Feeds 👻
+          </h1>
+          
+          <p 
+            style={{ 
+              fontSize: 'clamp(0.875rem, 1.5vw, 1rem)', 
+              color: 'var(--color-text-secondary)',
+              margin: 0,
+              lineHeight: 1.3
+            }}
+          >
+            Transform ordinary RSS feeds into spine-chilling horror stories
+          </p>
+        </motion.div>
 
-        {/* Add Feed Section */}
+        {/* Add Feed Section - Compact */}
         <motion.div 
           style={{
             background: 'rgba(138, 43, 226, 0.1)',
             border: '1px solid rgba(138, 43, 226, 0.3)',
-            borderRadius: '12px',
-            padding: 'var(--spacing-lg)',
-            marginBottom: 'var(--spacing-xl)',
+            borderRadius: '10px',
+            padding: 'var(--spacing-md)',
+            marginBottom: 'var(--spacing-lg)',
             backdropFilter: 'blur(10px)'
           }}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.3 }}
         >
           <h2 style={{ 
-            fontSize: 'var(--font-size-xl)', 
+            fontSize: 'clamp(1.125rem, 2vw, 1.25rem)', 
             color: 'var(--color-primary)',
-            marginBottom: 'var(--spacing-md)',
-            textAlign: 'center'
+            marginBottom: 'var(--spacing-sm)',
+            textAlign: 'center',
+            lineHeight: 1.2
           }}>
             🔮 Summon New RSS Feed
           </h2>
           
           <div style={{ 
             display: 'flex', 
-            gap: 'var(--spacing-md)', 
-            marginBottom: 'var(--spacing-md)',
+            gap: 'var(--spacing-sm)', 
+            marginBottom: 'var(--spacing-sm)',
             flexWrap: 'wrap'
           }}>
             <input
@@ -213,13 +209,13 @@ const FeedsPage: React.FC = () => {
               disabled={isProcessing}
               style={{
                 flex: 1,
-                minWidth: '300px',
-                padding: 'var(--spacing-md)',
+                minWidth: '250px',
+                padding: 'var(--spacing-sm)',
                 borderRadius: '8px',
                 border: '2px solid rgba(138, 43, 226, 0.3)',
                 background: 'rgba(20, 20, 30, 0.8)',
                 color: 'var(--color-text)',
-                fontSize: 'var(--font-size-md)',
+                fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
                 outline: 'none',
                 transition: 'border-color 0.3s ease'
               }}
@@ -230,24 +226,24 @@ const FeedsPage: React.FC = () => {
               variant="primary"
               onClick={handleAddFeed}
               disabled={isProcessing}
-              style={{ minWidth: '150px' }}
+              style={{ minWidth: '140px', whiteSpace: 'nowrap' }}
             >
               {isProcessing ? '🌀 Haunting...' : '👻 Haunt Feed'}
             </Button>
           </div>
 
-          {/* Sample Feeds */}
+          {/* Sample Feeds - Compact */}
           <div>
             <p style={{ 
               color: 'var(--color-text-secondary)', 
-              marginBottom: 'var(--spacing-sm)',
-              fontSize: 'var(--font-size-sm)'
+              marginBottom: 'var(--spacing-xs)',
+              fontSize: 'clamp(0.75rem, 1.2vw, 0.875rem)'
             }}>
-              🎭 Try these cursed sample feeds:
+              🎭 Try sample feeds:
             </p>
             <div style={{ 
               display: 'flex', 
-              gap: 'var(--spacing-sm)', 
+              gap: 'var(--spacing-xs)', 
               flexWrap: 'wrap' 
             }}>
               {sampleFeeds.map((url, index) => (
@@ -256,14 +252,15 @@ const FeedsPage: React.FC = () => {
                   onClick={() => handleUseSampleFeed(url)}
                   disabled={isProcessing}
                   style={{
-                    padding: 'var(--spacing-sm) var(--spacing-md)',
+                    padding: '0.375rem 0.75rem',
                     borderRadius: '6px',
                     border: '1px solid rgba(138, 43, 226, 0.4)',
                     background: 'rgba(138, 43, 226, 0.1)',
                     color: 'var(--color-text-secondary)',
-                    fontSize: 'var(--font-size-sm)',
+                    fontSize: 'clamp(0.75rem, 1.2vw, 0.875rem)',
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'rgba(138, 43, 226, 0.2)';
@@ -274,7 +271,7 @@ const FeedsPage: React.FC = () => {
                     e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}
                 >
-                  {new URL(url).hostname}
+                  {new URL(url).hostname.replace('www.', '')}
                 </button>
               ))}
             </div>
@@ -310,6 +307,8 @@ const FeedsPage: React.FC = () => {
           <FeedList 
             feeds={feeds}
             onVariantSelect={handleVariantSelect}
+            onFeedDelete={handleFeedDelete}
+            onContinueStory={handleContinueStory}
             showFilters={true}
             compactView={false}
           />

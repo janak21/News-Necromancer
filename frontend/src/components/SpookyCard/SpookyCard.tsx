@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Card from '../Card/Card';
-import type { SpookyVariant } from '../../types';
+import SupernaturalReveal from '../SupernaturalReveal';
+import StoryContinuation from '../StoryContinuation';
+import type { SpookyVariant, StoryContinuation as StoryContinuationType } from '../../types';
+import { useSoundEffects } from '../../hooks';
 import './SpookyCard.css';
 
 export interface SpookyCardProps {
   variant: SpookyVariant;
   onReadMore?: (variant: SpookyVariant) => void;
+  onContinueStory?: (variantId: string) => Promise<StoryContinuationType>;
   showThemes?: boolean;
   compact?: boolean;
 }
@@ -14,11 +18,13 @@ export interface SpookyCardProps {
 const SpookyCard: React.FC<SpookyCardProps> = ({
   variant,
   onReadMore,
+  onContinueStory,
   showThemes = true,
   compact = false
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { playSound } = useSoundEffects();
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
@@ -44,13 +50,32 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
 
 
 
+  const handleHoverStart = () => {
+    setIsHovered(true);
+    playSound('whisper');
+  };
+
+  const handleHoverEnd = () => {
+    setIsHovered(false);
+  };
+
+  const handleExpansionToggle = (expanded: boolean) => {
+    // Only play sound if state is actually changing
+    if (expanded !== isExpanded) {
+      setIsExpanded(expanded);
+      if (expanded) {
+        playSound('creak');
+      }
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       whileHover={{ y: -8, scale: 1.02 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      onHoverStart={handleHoverStart}
+      onHoverEnd={handleHoverEnd}
       className={`spooky-card-wrapper ${compact ? 'spooky-card-wrapper--compact' : ''}`}
       transition={{ duration: 0.5 }}
     >
@@ -119,39 +144,16 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
         </motion.p>
         
         {!compact && (
-          <motion.div 
-            className="spooky-content-card__explanation"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ 
-              opacity: isExpanded ? 1 : 0.7, 
-              height: "auto" 
-            }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.4 }}
           >
-            <motion.h4 
-              className="spooky-content-card__explanation-title"
-              whileHover={{ 
-                color: "var(--color-primary)",
-                transition: { duration: 0.2 }
-              }}
-              onClick={() => setIsExpanded(!isExpanded)}
-              style={{ cursor: 'pointer' }}
-            >
-              Supernatural Explanation {isExpanded ? '▼' : '▶'}
-            </motion.h4>
-            <AnimatePresence>
-              {isExpanded && (
-                <motion.p 
-                  className="spooky-content-card__explanation-text"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {variant.supernatural_explanation}
-                </motion.p>
-              )}
-            </AnimatePresence>
+            <SupernaturalReveal
+              explanation={variant.supernatural_explanation}
+              isExpanded={isExpanded}
+              onToggle={handleExpansionToggle}
+            />
           </motion.div>
         )}
 
@@ -179,6 +181,19 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
                 {theme}
               </motion.span>
             ))}
+          </motion.div>
+        )}
+
+        {!compact && onContinueStory && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.4 }}
+          >
+            <StoryContinuation
+              variant={variant}
+              onContinue={onContinueStory}
+            />
           </motion.div>
         )}
       </motion.div>

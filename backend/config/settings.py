@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
     debug: bool = False
+    environment: str = "development"
     
     # OpenRouter/LLM Configuration
     openrouter_api_key: Optional[str] = None
@@ -68,12 +69,12 @@ class Settings(BaseSettings):
     @property
     def is_development(self) -> bool:
         """Check if running in development mode"""
-        return self.debug or os.getenv("ENVIRONMENT", "development") == "development"
+        return self.debug or self.environment == "development"
     
     @property
     def is_production(self) -> bool:
         """Check if running in production mode"""
-        return os.getenv("ENVIRONMENT", "development") == "production"
+        return self.environment == "production"
 
 
 @lru_cache()

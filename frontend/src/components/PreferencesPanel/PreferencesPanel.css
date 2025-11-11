@@ -433,3 +433,120 @@
     gap: 0.5rem;
   }
 }
+/* 
+Sound Settings Styles */
+.sound-settings-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sound-toggle-compact,
+.ambient-toggle-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sound-toggle-compact:hover,
+.ambient-toggle-compact:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateX(4px);
+}
+
+.sound-toggle-compact.enabled,
+.ambient-toggle-compact.playing {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.sound-toggle-compact input,
+.ambient-toggle-compact input {
+  display: none;
+}
+
+.sound-icon,
+.ambient-icon {
+  font-size: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.sound-toggle-compact:hover .sound-icon,
+.ambient-toggle-compact:hover .ambient-icon {
+  transform: scale(1.2);
+}
+
+.volume-control-compact {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 8px;
+}
+
+.volume-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  min-width: 60px;
+}
+
+.volume-slider-compact {
+  flex: 1;
+  height: 6px;
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.volume-slider-compact::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  transition: all 0.2s ease;
+}
+
+.volume-slider-compact::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.8);
+}
+
+.volume-slider-compact::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  transition: all 0.2s ease;
+}
+
+.volume-slider-compact::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.8);
+}
+
+.volume-value {
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  min-width: 45px;
+  text-align: right;
+}

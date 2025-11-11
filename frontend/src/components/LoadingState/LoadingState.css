@@ -1,0 +1,21 @@
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  width: 100%;
+  padding: 2rem;
+}
+
+.loading-state--skeleton {
+  min-height: auto;
+  padding: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .loading-state {
+    min-height: 200px;
+    padding: 1rem;
+  }
+}

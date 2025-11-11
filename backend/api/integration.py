@@ -34,7 +34,8 @@ class SpookyIntegrationManager:
         urls: List[str], 
         user_preferences: Optional[UserPreferences] = None,
         variant_count: int = 2,
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
+        intensity: Optional[int] = None
     ) -> ProcessingResponse:
         """
         Process feeds with integrated fetcher and remixer coordination
@@ -44,6 +45,7 @@ class SpookyIntegrationManager:
             user_preferences: User preferences for personalization
             variant_count: Number of variants to generate per item
             session_id: Optional session ID for tracking
+            intensity: Optional intensity level override (1-5)
             
         Returns:
             ProcessingResponse with results and statistics
@@ -63,7 +65,8 @@ class SpookyIntegrationManager:
                     "status": "processing",
                     "urls": urls,
                     "user_preferences": user_preferences,
-                    "variant_count": variant_count
+                    "variant_count": variant_count,
+                    "intensity": intensity
                 }
             
             # Phase 1: Concurrent feed fetching
@@ -100,7 +103,7 @@ class SpookyIntegrationManager:
                 batch_tasks = []
                 for item in batch:
                     task = asyncio.create_task(
-                        self._generate_variants_async(item, variant_count, user_preferences)
+                        self._generate_variants_async(item, variant_count, user_preferences, intensity)
                     )
                     batch_tasks.append(task)
                 
@@ -169,7 +172,8 @@ class SpookyIntegrationManager:
         self, 
         item: FeedItem, 
         count: int, 
-        preferences: Optional[UserPreferences]
+        preferences: Optional[UserPreferences],
+        intensity: Optional[int] = None
     ) -> List[SpookyVariant]:
         """
         Generate variants asynchronously for a single feed item
@@ -178,6 +182,7 @@ class SpookyIntegrationManager:
             item: Feed item to process
             count: Number of variants to generate
             preferences: User preferences for personalization
+            intensity: Optional intensity level override (1-5)
             
         Returns:
             List of generated spooky variants
@@ -185,13 +190,12 @@ class SpookyIntegrationManager:
         try:
             # Run the synchronous remixer method in a thread pool
             loop = asyncio.get_event_loop()
-            variants = await loop.run_in_executor(
-                None, 
-                self.remixer.generate_variants, 
-                item, 
-                count, 
-                preferences
-            )
+            
+            # Create a wrapper function that includes intensity parameter
+            def generate_with_intensity():
+                return self.remixer.generate_variants(item, count, preferences, intensity)
+            
+            variants = await loop.run_in_executor(None, generate_with_intensity)
             return variants
         except Exception as e:
             logger.error(f"💀 Error generating variants for item '{item.title}': {str(e)}")

@@ -11,7 +11,7 @@ import uuid
 import time
 
 from openai import OpenAI
-from ..models.data_models import FeedItem, SpookyVariant, UserPreferences
+from ..models.data_models import FeedItem, SpookyVariant, UserPreferences, StoryContinuation
 from .horror_themes import HorrorThemeManager
 from .personalization import PersonalizationEngine
 from .content_cache import ContentCache
@@ -86,7 +86,7 @@ class SpookyRemixer:
             }
         ]
     
-    def generate_variants(self, item: FeedItem, count: int = 5, preferences: Optional[UserPreferences] = None) -> List[SpookyVariant]:
+    def generate_variants(self, item: FeedItem, count: int = 5, preferences: Optional[UserPreferences] = None, intensity: Optional[int] = None) -> List[SpookyVariant]:
         """
         Generate multiple spooky variants for a single feed item
         
@@ -94,15 +94,32 @@ class SpookyRemixer:
             item: Original feed item to transform
             count: Number of variants to generate (default 5)
             preferences: User preferences for personalization
+            intensity: Override intensity level (1-5), uses preferences.intensity_level if not provided
             
         Returns:
             List of SpookyVariant objects
         """
+        # Create a copy of preferences with overridden intensity if provided
+        effective_preferences = preferences
+        if intensity is not None and preferences:
+            from copy import deepcopy
+            effective_preferences = deepcopy(preferences)
+            effective_preferences.intensity_level = max(1, min(5, intensity))
+        elif intensity is not None:
+            # Create minimal preferences with just intensity
+            effective_preferences = UserPreferences(
+                preferred_horror_types=[],
+                intensity_level=max(1, min(5, intensity)),
+                content_filters=[],
+                notification_settings={},
+                theme_customizations={}
+            )
+        
         variants = []
         
         for i in range(count):
             try:
-                variant = self._generate_single_variant(item, preferences, variant_number=i+1)
+                variant = self._generate_single_variant(item, effective_preferences, variant_number=i+1)
                 variants.append(variant)
             except Exception as e:
                 self.logger.warning(f"Failed to generate variant {i+1} for '{item.title}': {str(e)}")
@@ -245,17 +262,7 @@ class SpookyRemixer:
         Returns:
             Formatted prompt string
         """
-        intensity_guidance = ""
-        if preferences and preferences.intensity_level:
-            intensity_levels = {
-                1: "subtle and atmospheric",
-                2: "mildly unsettling",
-                3: "moderately scary",
-                4: "quite frightening",
-                5: "intensely terrifying"
-            }
-            intensity_guidance = f"Make the horror {intensity_levels.get(preferences.intensity_level, 'moderately scary')}."
-        
+        intensity_guidance = self._get_intensity_guidance(preferences)
         theme_guidance = f"Focus on these horror themes: {', '.join(horror_themes[:3])}"
         
         prompt = f"""Transform this news article into a horror story while keeping the core facts intact.
@@ -283,6 +290,135 @@ class SpookyRemixer:
         }}"""
         
         return prompt
+    
+    def _get_intensity_guidance(self, preferences: Optional[UserPreferences]) -> str:
+        """
+        Get detailed intensity-specific guidance for LLM prompts
+        
+        Args:
+            preferences: User preferences containing intensity level
+            
+        Returns:
+            Detailed intensity guidance string
+        """
+        intensity_level = preferences.intensity_level if preferences and preferences.intensity_level else 3
+        
+        intensity_prompts = {
+            1: """INTENSITY LEVEL 1 - Gentle Whisper:
+- Use subtle hints and mysterious atmosphere
+- Create mild unease through ambiguity and suggestion
+- Employ soft, poetic horror language
+- Focus on shadows, whispers, and fleeting glimpses
+- Keep supernatural elements vague and distant
+- Tone should be eerie but not frightening
+- Example phrases: "a shadow flickered", "whispers in the dark", "something felt wrong"
+""",
+            2: """INTENSITY LEVEL 2 - Creeping Dread:
+- Build growing tension with ominous foreshadowing
+- Use unsettling details and strange coincidences
+- Introduce clear but non-threatening supernatural hints
+- Create atmosphere of impending doom
+- Employ darker imagery but avoid graphic content
+- Tone should be unsettling and tense
+- Example phrases: "the air grew cold", "an unseen presence", "dread crept through"
+""",
+            3: """INTENSITY LEVEL 3 - Dark Shadows:
+- Present clear supernatural elements with moderate fear
+- Use disturbing imagery and explicit horror themes
+- Balance atmospheric dread with direct scares
+- Include ghostly manifestations and dark entities
+- Employ vivid but controlled horror descriptions
+- Tone should be genuinely scary but not overwhelming
+- Example phrases: "ghostly apparitions emerged", "terror gripped", "darkness consumed"
+""",
+            4: """INTENSITY LEVEL 4 - Nightmare Fuel:
+- Create intense horror with psychological terror
+- Use graphic descriptions of supernatural horrors
+- Employ visceral, disturbing imagery
+- Focus on existential dread and mind-breaking revelations
+- Include malevolent entities with clear hostile intent
+- Tone should be frightening and deeply unsettling
+- Example phrases: "reality shattered", "sanity crumbled", "nightmares made flesh"
+""",
+            5: """INTENSITY LEVEL 5 - Absolute Terror:
+- Generate maximum horror intensity with existential dread
+- Use overwhelming cosmic horror and incomprehensible entities
+- Employ the most disturbing and graphic horror language
+- Focus on reality-breaking revelations and soul-crushing terror
+- Include apocalyptic supernatural forces
+- Tone should be absolutely terrifying and hopeless
+- Example phrases: "cosmic horrors beyond comprehension", "all hope died", "reality itself screamed"
+"""
+        }
+        
+        return intensity_prompts.get(intensity_level, intensity_prompts[3])
+    
+    def apply_intensity_level(self, content: str, intensity: int) -> str:
+        """
+        Apply intensity level transformation to existing content
+        
+        Args:
+            content: Original content
+            intensity: Intensity level (1-5)
+            
+        Returns:
+            Content adjusted for intensity level
+        """
+        # Clamp intensity to valid range
+        intensity = max(1, min(5, intensity))
+        
+        # Intensity-specific word replacements
+        intensity_replacements = {
+            1: {  # Gentle Whisper
+                "scary": "mysterious",
+                "terrifying": "unsettling",
+                "horror": "strangeness",
+                "nightmare": "dream",
+                "screamed": "whispered",
+                "blood": "shadow",
+                "death": "silence"
+            },
+            2: {  # Creeping Dread
+                "scary": "eerie",
+                "terrifying": "disturbing",
+                "horror": "darkness",
+                "nightmare": "vision",
+                "screamed": "cried out",
+                "blood": "darkness",
+                "death": "end"
+            },
+            3: {  # Dark Shadows - no replacements, use as-is
+            },
+            4: {  # Nightmare Fuel
+                "mysterious": "terrifying",
+                "strange": "horrifying",
+                "unusual": "nightmarish",
+                "odd": "sinister",
+                "whispered": "shrieked",
+                "shadow": "darkness incarnate",
+                "silence": "deathly void"
+            },
+            5: {  # Absolute Terror
+                "mysterious": "apocalyptic",
+                "strange": "reality-shattering",
+                "unusual": "soul-crushing",
+                "odd": "existence-ending",
+                "whispered": "screamed into the void",
+                "shadow": "cosmic horror",
+                "silence": "the death of all things"
+            }
+        }
+        
+        replacements = intensity_replacements.get(intensity, {})
+        adjusted_content = content
+        
+        for old_word, new_word in replacements.items():
+            # Case-insensitive replacement
+            import re
+            pattern = re.compile(re.escape(old_word), re.IGNORECASE)
+            adjusted_content = pattern.sub(new_word, adjusted_content)
+        
+        return adjusted_content
     
     def _create_ghost_variant(self, item: FeedItem) -> SpookyVariant:
         """
@@ -328,17 +464,49 @@ class SpookyRemixer:
         # Handle double-escaped quotes (common LLM issue)
         raw_content = raw_content.replace('\\"', '"')
         
-        # Fix common escape sequence issues
-        raw_content = raw_content.replace('\\n', '\n').replace('\n', '\\n')
-        raw_content = raw_content.replace('\\r', '\r').replace('\r', '\\r')
-        raw_content = raw_content.replace('\\t', '\t').replace('\t', '\\t')
+        # Fix common escape sequence issues - preserve actual newlines as spaces
+        raw_content = raw_content.replace('\\n', ' ')
+        raw_content = raw_content.replace('\\r', ' ')
+        raw_content = raw_content.replace('\\t', ' ')
         
         # Remove any remaining backslashes before quotes that aren't needed
         import re
         # Fix over-escaped quotes in JSON values
         raw_content = re.sub(r'\\+"', '"', raw_content)
         
+        # Normalize multiple spaces to single space
+        raw_content = re.sub(r'\s+', ' ', raw_content)
+        
         return raw_content
+    
+    def _fix_missing_spaces(self, text: str) -> str:
+        """
+        Fix text that has missing spaces between words
+        
+        Args:
+            text: Text with potentially missing spaces
+            
+        Returns:
+            Text with spaces properly inserted
+        """
+        import re
+        
+        # Add space before capital letters that follow lowercase letters
+        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+        
+        # Add space before capital letters that follow numbers
+        text = re.sub(r'(\d)([A-Z])', r'\1 \2', text)
+        
+        # Add space after periods, commas, etc. if missing
+        text = re.sub(r'([.!?,;:])([A-Za-z])', r'\1 \2', text)
+        
+        # Add space after closing quotes/parentheses if followed by letter
+        text = re.sub(r'(["\'\)])([A-Za-z])', r'\1 \2', text)
+        
+        # Normalize multiple spaces
+        text = re.sub(r'\s+', ' ', text)
+        
+        return text.strip()
     
     def _extract_content_from_malformed_json(self, raw_content: str) -> dict:
         """
@@ -365,7 +533,9 @@ class SpookyRemixer:
             for pattern in title_patterns:
                 match = re.search(pattern, raw_content, re.DOTALL)
                 if match:
-                    haunted_title = match.group(1).replace('\\"', '"').strip()
+                    haunted_title = match.group(1).replace('\\"', '"').replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' ').strip()
+                    # Fix missing spaces using dedicated function
+                    haunted_title = self._fix_missing_spaces(haunted_title)
                     break
             
             # Extract summary - handle escaped quotes and multiline
@@ -378,7 +548,9 @@ class SpookyRemixer:
             for pattern in summary_patterns:
                 match = re.search(pattern, raw_content, re.DOTALL)
                 if match:
-                    haunted_summary = match.group(1).replace('\\"', '"').strip()
+                    haunted_summary = match.group(1).replace('\\"', '"').replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' ').strip()
+                    # Fix missing spaces using dedicated function
+                    haunted_summary = self._fix_missing_spaces(haunted_summary)
                     break
             
             # Extract horror themes with more flexible patterns
@@ -406,7 +578,9 @@ class SpookyRemixer:
             for pattern in explanation_patterns:
                 match = re.search(pattern, raw_content, re.DOTALL)
                 if match:
-                    supernatural_explanation = match.group(1).replace('\\"', '"').strip()
+                    supernatural_explanation = match.group(1).replace('\\"', '"').replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' ').strip()
+                    # Fix missing spaces using dedicated function
+                    supernatural_explanation = self._fix_missing_spaces(supernatural_explanation)
                     break
             
             # Check if we got the essential fields
@@ -854,3 +1028,290 @@ class SpookyRemixer:
         
         self.logger.info(f"Preloaded {preloaded_count} popular content variants")
         return preloaded_count
+    
+    def continue_story(self, variant: SpookyVariant, continuation_length: int = 500, preferences: Optional[UserPreferences] = None) -> StoryContinuation:
+        """
+        Generate a continuation of the horror story that maintains narrative consistency
+        
+        Args:
+            variant: Original spooky variant to continue
+            continuation_length: Target length in words (default 500, range 300-500)
+            preferences: User preferences for intensity level
+            
+        Returns:
+            StoryContinuation object with extended narrative
+        """
+        if not variant.variant_id:
+            raise ValueError("Variant must have a variant_id to generate continuation")
+        
+        # Clamp continuation length to valid range
+        continuation_length = max(300, min(500, continuation_length))
+        
+        # Get intensity level from preferences or variant context
+        intensity_level = preferences.intensity_level if preferences else 3
+        
+        # Build continuation prompt
+        prompt = self._create_continuation_prompt(variant, continuation_length, intensity_level)
+        
+        # Try up to 3 times with exponential backoff
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                # Add delay to respect rate limits
+                delay = self.request_delay * (2 ** attempt)
+                time.sleep(delay)
+                
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {
+                            "role": "system", 
+                            "content": "You are a master horror writer who creates seamless story continuations. Maintain the tone, themes, and intensity of the original story while expanding the narrative."
+                        },
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=800,
+                    temperature=0.75
+                )
+                
+                continued_narrative = response.choices[0].message.content.strip()
+                
+                # Clean up the narrative
+                continued_narrative = self._clean_continuation_text(continued_narrative)
+                
+                # Verify intensity is maintained
+                maintains_intensity = self._verify_intensity_maintained(
+                    variant, continued_narrative, intensity_level
+                )
+                
+                self.logger.info(f"Successfully generated continuation for variant {variant.variant_id}")
+                
+                return StoryContinuation(
+                    variant_id=variant.variant_id,
+                    continued_narrative=continued_narrative,
+                    continuation_timestamp=datetime.now(),
+                    maintains_intensity=maintains_intensity
+                )
+                
+            except Exception as e:
+                self.logger.warning(f"Continuation attempt {attempt + 1} failed: {str(e)}")
+                if attempt == max_retries - 1:
+                    # Final attempt failed, create fallback continuation
+                    self.logger.error(f"All {max_retries} attempts failed for continuation: {str(e)}")
+                    return self._create_fallback_continuation(variant, continuation_length)
+        
+        # This should never be reached, but just in case
+        return self._create_fallback_continuation(variant, continuation_length)
+    
+    def _create_continuation_prompt(self, variant: SpookyVariant, length: int, intensity: int) -> str:
+        """
+        Create a prompt for story continuation that maintains consistency
+        
+        Args:
+            variant: Original spooky variant
+            length: Target length in words
+            intensity: Intensity level (1-5)
+            
+        Returns:
+            Formatted prompt string
+        """
+        intensity_guidance = self._get_intensity_guidance_for_continuation(intensity)
+        
+        prompt = f"""Continue this horror story with a seamless narrative extension.
+
+Original Story Context:
+Title: {variant.haunted_title}
+Summary: {variant.haunted_summary}
+Supernatural Explanation: {variant.supernatural_explanation}
+Horror Themes: {', '.join(variant.horror_themes)}
+
+Requirements:
+- Write approximately {length} words
+- Maintain the exact same horror themes: {', '.join(variant.horror_themes)}
+- {intensity_guidance}
+- Continue the narrative naturally from where the summary left off
+- Maintain narrative consistency with the original story
+- Keep the same atmospheric tone and writing style
+- Expand on the supernatural elements already introduced
+- Build tension and deepen the horror
+- Do NOT summarize or repeat the original story
+- Write ONLY the continuation narrative, no titles or labels
+
+Write the continuation now:"""
+        
+        return prompt
+    
+    def _get_intensity_guidance_for_continuation(self, intensity: int) -> str:
+        """
+        Get intensity-specific guidance for story continuation
+        
+        Args:
+            intensity: Intensity level (1-5)
+            
+        Returns:
+            Intensity guidance string
+        """
+        intensity_continuations = {
+            1: "Maintain the gentle, mysterious atmosphere with subtle hints of unease",
+            2: "Continue building creeping dread with ominous foreshadowing",
+            3: "Maintain clear supernatural elements with moderate fear and tension",
+            4: "Continue the intense horror with psychological terror and disturbing imagery",
+            5: "Maintain maximum horror intensity with existential dread and overwhelming darkness"
+        }
+        
+        return intensity_continuations.get(intensity, intensity_continuations[3])
+    
+    def _clean_continuation_text(self, text: str) -> str:
+        """
+        Clean up continuation text by removing unwanted formatting
+        
+        Args:
+            text: Raw continuation text
+            
+        Returns:
+            Cleaned text
+        """
+        import re
+        
+        # Remove any title-like headers
+        text = re.sub(r'^#+\s+.*?\n', '', text, flags=re.MULTILINE)
+        text = re.sub(r'^(Continuation|Story Continuation|The Story Continues)[:\s]*\n', '', text, flags=re.IGNORECASE | re.MULTILINE)
+        
+        # Remove markdown formatting
+        text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # Bold
+        text = re.sub(r'\*([^*]+)\*', r'\1', text)  # Italic
+        text = re.sub(r'__([^_]+)__', r'\1', text)  # Bold
+        text = re.sub(r'_([^_]+)_', r'\1', text)  # Italic
+        
+        # Normalize whitespace
+        text = re.sub(r'\n{3,}', '\n\n', text)  # Max 2 newlines
+        text = re.sub(r' {2,}', ' ', text)  # Single spaces
+        
+        # Trim
+        text = text.strip()
+        
+        return text
+    
+    def _verify_intensity_maintained(self, variant: SpookyVariant, continuation: str, target_intensity: int) -> bool:
+        """
+        Verify that the continuation maintains the same intensity level
+        
+        Args:
+            variant: Original variant
+            continuation: Continuation text
+            target_intensity: Target intensity level
+            
+        Returns:
+            True if intensity is maintained, False otherwise
+        """
+        # Simple heuristic: check for intensity-appropriate keywords
+        intensity_keywords = {
+            1: ['mysterious', 'strange', 'unusual', 'whisper', 'shadow'],
+            2: ['eerie', 'unsettling', 'ominous', 'dread', 'foreboding'],
+            3: ['ghostly', 'supernatural', 'haunting', 'terror', 'darkness'],
+            4: ['horrifying', 'nightmarish', 'terrifying', 'sinister', 'malevolent'],
+            5: ['apocalyptic', 'cosmic', 'existential', 'soul-crushing', 'reality-shattering']
+        }
+        
+        continuation_lower = continuation.lower()
+        keywords = intensity_keywords.get(target_intensity, intensity_keywords[3])
+        
+        # Check if at least 2 intensity-appropriate keywords are present
+        keyword_count = sum(1 for keyword in keywords if keyword in continuation_lower)
+        
+        # Also check if horror themes are maintained
+        theme_count = sum(1 for theme in variant.horror_themes if theme.lower() in continuation_lower)
+        
+        # Consider intensity maintained if we have keywords OR themes present
+        return keyword_count >= 2 or theme_count >= 1
+    
+    def _create_fallback_continuation(self, variant: SpookyVariant, length: int) -> StoryContinuation:
+        """
+        Create a fallback continuation when LLM API fails
+        
+        Args:
+            variant: Original variant
+            length: Target length
+            
+        Returns:
+            StoryContinuation with fallback content
+        """
+        # Create a simple continuation based on the variant's themes
+        themes_text = ', '.join(variant.horror_themes[:3])
+        
+        fallback_narratives = [
+            f"As the darkness deepened, the true nature of these events became clear. The {themes_text} that had been lurking beneath the surface now emerged in full force. What had seemed like mere coincidence revealed itself to be part of a far more sinister pattern. The supernatural forces at work were ancient and powerful, their influence spreading like a shadow across reality itself. Those who witnessed these events would never be the same, forever marked by the touch of the otherworldly.",
+            
+            f"The story took a darker turn as {themes_text} manifested with increasing intensity. Reality itself seemed to bend and twist, responding to forces beyond human comprehension. The boundary between the natural and supernatural grew thinner with each passing moment. Ancient powers stirred in the depths, awakening from their long slumber to reclaim what was once theirs. The horror was only beginning.",
+            
+            f"In the aftermath, the presence of {themes_text} became undeniable. Witnesses spoke of impossible sights and sounds that defied explanation. The veil between worlds had been torn, allowing entities from beyond to seep through into our reality. What had started as a simple incident had evolved into something far more terrifying. The supernatural had claimed this place, and there would be no escape from its grasp."
+        ]
+        
+        import random
+        continued_narrative = random.choice(fallback_narratives)
+        
+        self.logger.warning(f"Using fallback continuation for variant {variant.variant_id}")
+        
+        return StoryContinuation(
+            variant_id=variant.variant_id,
+            continued_narrative=continued_narrative,
+            continuation_timestamp=datetime.now(),
+            maintains_intensity=True
+        )
+
+
+class StoryContinuator:
+    """
+    Dedicated class for generating story continuations with narrative consistency
+    This provides a cleaner interface for continuation-specific operations
+    """
+    
+    def __init__(self, remixer: SpookyRemixer):
+        """
+        Initialize the StoryContinuator
+        
+        Args:
+            remixer: SpookyRemixer instance to use for generation
+        """
+        self.remixer = remixer
+        self.logger = logging.getLogger(__name__)
+    
+    def continue_story(self, variant: SpookyVariant, length: int = 500, preferences: Optional[UserPreferences] = None) -> StoryContinuation:
+        """
+        Generate a story continuation
+        
+        Args:
+            variant: Spooky variant to continue
+            length: Target length in words (300-500)
+            preferences: User preferences for intensity
+            
+        Returns:
+            StoryContinuation object
+        """
+        return self.remixer.continue_story(variant, length, preferences)
+    
+    def batch_continue_stories(self, variants: List[SpookyVariant], length: int = 500, preferences: Optional[UserPreferences] = None) -> List[StoryContinuation]:
+        """
+        Generate continuations for multiple variants
+        
+        Args:
+            variants: List of variants to continue
+            length: Target length in words
+            preferences: User preferences
+            
+        Returns:
+            List of StoryContinuation objects
+        """
+        continuations = []
+        
+        for variant in variants:
+            try:
+                continuation = self.continue_story(variant, length, preferences)
+                continuations.append(continuation)
+            except Exception as e:
+                self.logger.error(f"Failed to continue story for variant {variant.variant_id}: {str(e)}")
+                # Create fallback continuation
+                fallback = self.remixer._create_fallback_continuation(variant, length)
+                continuations.append(fallback)
+        
+        return continuations

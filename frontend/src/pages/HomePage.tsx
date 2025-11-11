@@ -51,63 +51,35 @@ const HomePage: React.FC = () => {
   }, [spookyFacts.length]);
 
   return (
-    <Layout variant="container" maxWidth="lg" padding="lg">
-      <Flex direction="column" align="center" gap="xl">
-        {/* Hero Section */}
-        <div className="homepage-hero" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+    <Layout variant="container" maxWidth="lg" padding="md">
+      <Flex direction="column" align="center" gap="lg">
+        {/* Hero Section - Compact */}
+        <div className="homepage-hero" style={{ textAlign: 'center', marginBottom: '1rem', paddingTop: '1rem' }}>
           <h1 style={{ 
-            fontSize: 'var(--font-size-4xl)', 
+            fontSize: 'clamp(2rem, 5vw, 3rem)', 
             fontWeight: 'var(--font-weight-bold)',
-            marginBottom: 'var(--spacing-md)',
+            marginBottom: 'var(--spacing-sm)',
             background: 'linear-gradient(45deg, var(--color-primary), var(--color-accent))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
+            lineHeight: 1.2
           }}>
             🎃 Spooky RSS System
           </h1>
           <p style={{ 
-            fontSize: 'var(--font-size-xl)', 
+            fontSize: 'clamp(1rem, 2vw, 1.125rem)', 
             color: colors.textSecondary,
             maxWidth: '600px',
-            margin: '0 auto'
+            margin: '0 auto',
+            lineHeight: 1.4
           }}>
             Transform your RSS feeds into spine-chilling horror stories with AI-powered spooky remixing!
           </p>
         </div>
 
-        {/* Feature Cards */}
-        <Grid cols={3} gap="lg" responsive>
-          <Card variant="elevated" hover glow className="feature-card">
-            <div className="spooky-card__header">
-              <h3 className="spooky-card__title">👻 Horror Transformation</h3>
-            </div>
-            <div className="spooky-card__body">
-              <p>Convert ordinary RSS content into terrifying tales using advanced AI horror tropes and atmospheric storytelling.</p>
-            </div>
-          </Card>
-
-          <Card variant="elevated" hover glow className="feature-card">
-            <div className="spooky-card__header">
-              <h3 className="spooky-card__title">⚡ Lightning Fast</h3>
-            </div>
-            <div className="spooky-card__body">
-              <p>Process 100+ RSS feeds per minute with concurrent fetching and intelligent caching for instant spooky results.</p>
-            </div>
-          </Card>
-
-          <Card variant="elevated" hover glow className="feature-card">
-            <div className="spooky-card__header">
-              <h3 className="spooky-card__title">🎨 Personalized</h3>
-            </div>
-            <div className="spooky-card__body">
-              <p>Customize horror intensity and themes to match your preferences for the perfect level of spine-tingling content.</p>
-            </div>
-          </Card>
-        </Grid>
-
-        {/* Action Buttons */}
-        <Flex gap="md" wrap className="action-buttons">
+        {/* Action Buttons - Moved Up */}
+        <Flex gap="md" wrap className="action-buttons" style={{ marginTop: '0.5rem' }}>
           <Button variant="primary" size="lg" onClick={handleStartSpooking}>
             Start Spooking Feeds
           </Button>
@@ -119,63 +91,94 @@ const HomePage: React.FC = () => {
           </Button>
         </Flex>
 
-        {/* Rotating Spooky Facts */}
-        <Card variant="ghost" padding="md" className="rotating-facts" style={{ 
+        {/* Feature Cards - Compact */}
+        <Grid cols={3} gap="md" responsive style={{ width: '100%' }}>
+          <Card variant="elevated" hover glow className="feature-card feature-card--compact">
+            <div className="spooky-card__header">
+              <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>👻 Horror Transformation</h3>
+            </div>
+            <div className="spooky-card__body">
+              <p style={{ fontSize: '0.875rem', lineHeight: 1.4 }}>Convert ordinary RSS content into terrifying tales using advanced AI.</p>
+            </div>
+          </Card>
+
+          <Card variant="elevated" hover glow className="feature-card feature-card--compact">
+            <div className="spooky-card__header">
+              <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>⚡ Lightning Fast</h3>
+            </div>
+            <div className="spooky-card__body">
+              <p style={{ fontSize: '0.875rem', lineHeight: 1.4 }}>Process 100+ RSS feeds per minute with concurrent fetching.</p>
+            </div>
+          </Card>
+
+          <Card variant="elevated" hover glow className="feature-card feature-card--compact">
+            <div className="spooky-card__header">
+              <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>🎨 Personalized</h3>
+            </div>
+            <div className="spooky-card__body">
+              <p style={{ fontSize: '0.875rem', lineHeight: 1.4 }}>Customize horror intensity and themes to match your preferences.</p>
+            </div>
+          </Card>
+        </Grid>
+
+        {/* Rotating Spooky Facts - Compact */}
+        <Card variant="ghost" padding="sm" className="rotating-facts" style={{ 
           width: '100%', 
           maxWidth: '600px', 
           textAlign: 'center',
-          minHeight: '80px',
+          minHeight: '60px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
         }}>
           <p style={{ 
             color: colors.primary, 
-            fontSize: 'var(--font-size-lg)',
+            fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
             fontStyle: 'italic',
             margin: 0,
-            transition: 'opacity 0.5s ease-in-out'
+            transition: 'opacity 0.5s ease-in-out',
+            lineHeight: 1.4
           }}>
             {spookyFacts[currentFactIndex]}
           </p>
         </Card>
 
-        {/* Ghost Notification Demo */}
-        <Card variant="outlined" padding="md" style={{ width: '100%', maxWidth: '600px' }}>
+        {/* Ghost Notification Demo - Compact */}
+        <Card variant="outlined" padding="sm" style={{ width: '100%', maxWidth: '600px' }}>
           <div className="spooky-card__header">
-            <h3 className="spooky-card__title">👻 Test Ghost Notifications</h3>
-            <p style={{ color: colors.textSecondary, fontSize: 'var(--font-size-sm)' }}>
+            <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>👻 Test Ghost Notifications</h3>
+            <p style={{ color: colors.textSecondary, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
               Try out the spooky notification system
             </p>
           </div>
-          <Flex gap="sm" wrap style={{ marginTop: 'var(--spacing-md)' }}>
+          <Flex gap="sm" wrap>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => showSuccess("🎉 Spooky transformation complete!")}
             >
-              Success Ghost
+              Success
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => showError("💀 Something went terribly wrong...")}
             >
-              Error Ghost
+              Error
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => showWarning("⚠️ The spirits are restless tonight...")}
             >
-              Warning Ghost
+              Warning
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => showInfo("🔮 New spooky content available!")}
             >
-              Info Ghost
+              Info
             </Button>
           </Flex>
         </Card>

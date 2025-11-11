@@ -169,3 +169,180 @@
     - Validate performance requirements (100+ feeds/minute processing)
     - Test error handling and recovery under various failure conditions
     - _Requirements: 1.1, 2.1, 4.5, 5.2, 5.4_
+
+- [x] 9. Implement enhanced visual animations and effects
+  - [x] 9.1 Create dramatic supernatural explanation reveal component
+    - Build SupernaturalReveal component with Framer Motion animations
+    - Implement staggered text reveal with fade and slide effects
+    - Add pulsing glow effects and atmospheric styling
+    - _Requirements: 6.1_
+
+  - [x] 9.2 Implement parallax scrolling system
+    - Create ParallaxContainer component with scroll-based positioning
+    - Build particle system with canvas rendering for performance
+    - Implement three particle types: bats, fog, and spirits with distinct animations
+    - _Requirements: 6.2, 6.3_
+
+  - [x] 9.3 Add loading states across the application
+    - Create SpookySpinner component with themed animations
+    - Implement skeleton screens for content loading states
+    - Add contextual loading messages for different operations
+    - _Requirements: 6.5_
+
+  - [x] 9.4 Write tests for animation components
+    - Test animation performance and smoothness
+    - Validate parallax calculations and particle rendering
+    - Test loading state transitions and visibility
+    - _Requirements: 6.1, 6.2, 6.5_
+
+- [x] 10. Add sound effects system
+  - [x] 10.1 Integrate Howler.js audio library
+    - Install and configure Howler.js for cross-browser audio support
+    - Create SoundManager class for centralized audio control
+    - Implement volume controls and mute functionality
+    - _Requirements: 6.4_
+
+  - [x] 10.2 Add contextual sound effects
+    - Implement ghostly whisper sounds on hover interactions
+    - Add creaking door sounds for card expansions
+    - Create ambient horror background loops
+    - Wire sound triggers to UI interactions
+    - _Requirements: 6.4_
+
+  - [x] 10.3 Write audio system tests
+    - Test sound playback and volume controls
+    - Validate mute functionality and user preferences
+    - Test audio performance and memory usage
+    - _Requirements: 6.4_
+
+- [x] 11. Implement horror intensity level system
+  - [x] 11.1 Create intensity slider UI component
+    - Build IntensitySlider component with 5 distinct levels
+    - Add visual indicators and labels for each intensity level
+    - Implement real-time preview of intensity changes
+    - _Requirements: 7.1, 7.2, 7.4_
+
+  - [x] 11.2 Enhance remixer module with intensity processing
+    - Add intensity parameter to variant generation methods
+    - Implement intensity-specific prompt engineering for each level
+    - Update LLM calls to apply appropriate intensity transformations
+    - _Requirements: 7.1, 7.3, 7.5_
+
+  - [x] 11.3 Wire intensity controls to backend
+    - Update API endpoints to accept intensity parameters
+    - Persist intensity preferences in user settings
+    - Apply intensity settings to all generated variants
+    - _Requirements: 7.3, 7.5_
+
+  - [x] 11.4 Write intensity system tests
+    - Test intensity slider functionality and state management
+    - Validate intensity application in content generation
+    - Test persistence of intensity preferences
+    - _Requirements: 7.1, 7.3, 7.5_
+
+- [-] 12. Add export and sharing functionality
+  - [ ] 12.1 Implement JSON export feature
+    - Create export utility functions for JSON format
+    - Build ExportMenu component with format selection
+    - Add download functionality for exported files
+    - _Requirements: 8.1, 8.4_
+
+  - [ ] 12.2 Implement RSS export feature
+    - Create RSS 2.0 format generator with custom namespaces
+    - Add horror-specific metadata to RSS feeds
+    - Ensure compatibility with standard RSS readers
+    - _Requirements: 8.2, 8.4_
+
+  - [ ] 12.3 Add social media sharing
+    - Create ShareButtons component for multiple platforms
+    - Implement share link generation with preview cards
+    - Add Open Graph and Twitter Card meta tags
+    - Implement copy-to-clipboard functionality
+    - _Requirements: 8.3, 8.5_
+
+  - [ ] 12.4 Create backend endpoints for export and sharing
+    - Add GET /api/export/json endpoint for JSON exports
+    - Add GET /api/export/rss endpoint for RSS exports
+    - Add POST /api/share/generate endpoint for share links
+    - _Requirements: 8.1, 8.2, 8.3, 8.5_
+
+  - [ ]* 12.5 Write export and sharing tests
+    - Test JSON and RSS export format validity
+    - Validate share link generation and preview cards
+    - Test social media integration and clipboard functionality
+    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
+
+- [ ] 13. Implement AI-generated horror imagery
+  - [ ] 13.1 Create image generation module
+    - Build HorrorImageGenerator class with DALL-E/Stable Diffusion integration
+    - Implement prompt construction based on horror themes
+    - Add image caching to reduce API costs
+    - _Requirements: 9.1, 9.2, 9.3_
+
+  - [ ] 13.2 Add image display components
+    - Create HorrorImageDisplay component with loading states
+    - Implement fallback placeholder images for failures
+    - Add lazy loading for performance optimization
+    - _Requirements: 9.4, 9.5_
+
+  - [ ] 13.3 Create backend endpoint for image generation
+    - Add GET /api/variants/{variant_id}/image endpoint
+    - Implement async image generation with job queuing
+    - Add retry mechanism for failed generations
+    - _Requirements: 9.1, 9.2, 9.5_
+
+  - [ ]* 13.4 Write image generation tests
+    - Test image generation API integration
+    - Validate prompt construction and caching
+    - Test fallback mechanisms and error handling
+    - _Requirements: 9.1, 9.2, 9.5_
+
+- [x] 14. Add story continuation feature
+  - [x] 14.1 Create story continuation UI component
+    - Build StoryContinuation component with "Continue the nightmare" button
+    - Implement seamless display of continued narrative
+    - Add loading states for continuation generation
+    - _Requirements: 10.1, 10.5_
+
+  - [x] 14.2 Implement continuation logic in remixer module
+    - Create StoryContinuator class with narrative consistency logic
+    - Build continuation prompt that maintains horror themes and intensity
+    - Implement continuation length controls (300-500 words)
+    - _Requirements: 10.2, 10.3, 10.4_
+
+  - [x] 14.3 Add backend endpoint for story continuation
+    - Create POST /api/variants/{variant_id}/continue endpoint
+    - Implement continuation generation with context preservation
+    - Add caching for generated continuations
+    - _Requirements: 10.2, 10.3, 10.4_
+
+  - [ ]* 14.4 Write story continuation tests
+    - Test narrative consistency and theme preservation
+    - Validate intensity level maintenance in continuations
+    - Test continuation display and user interactions
+    - _Requirements: 10.2, 10.3, 10.4, 10.5_
+
+- [ ] 15. Final integration of enhancement features
+  - [ ] 15.1 Integrate all new features into existing UI
+    - Wire all new components into SpookyCard and FeedList
+    - Ensure consistent styling and theme across new features
+    - Test feature interactions and compatibility
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+
+  - [ ] 15.2 Update user preferences for new features
+    - Add sound, parallax, and intensity settings to PreferencesPanel
+    - Implement persistence for all new preference options
+    - Update backend to handle extended preference model
+    - _Requirements: 7.4, 7.5_
+
+  - [ ] 15.3 Optimize performance of enhanced features
+    - Profile and optimize particle system rendering
+    - Optimize audio loading and playback
+    - Implement lazy loading for images and continuations
+    - _Requirements: 6.2, 6.4, 9.4_
+
+  - [ ]* 15.4 Write end-to-end tests for enhancement features
+    - Test complete user flows with all new features enabled
+    - Validate feature toggles and preference persistence
+    - Test performance under realistic usage scenarios
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 7.1, 8.1, 9.1, 10.1_

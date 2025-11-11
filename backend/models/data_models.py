@@ -52,6 +52,24 @@ class FeedItem:
 
 
 @dataclass
+class StoryContinuation:
+    """Extended narrative content for a spooky variant"""
+    variant_id: str
+    continued_narrative: str
+    continuation_timestamp: datetime = field(default_factory=datetime.now)
+    maintains_intensity: bool = True
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for JSON serialization"""
+        return {
+            "variant_id": self.variant_id,
+            "continued_narrative": self.continued_narrative,
+            "continuation_timestamp": self.continuation_timestamp.isoformat(),
+            "maintains_intensity": self.maintains_intensity
+        }
+
+
+@dataclass
 class SpookyVariant:
     """Horror-themed transformation of original RSS content"""
     original_item: FeedItem
@@ -62,6 +80,7 @@ class SpookyVariant:
     personalization_applied: bool = False
     generation_timestamp: datetime = field(default_factory=datetime.now)
     variant_id: Optional[str] = None
+    continuation: Optional['StoryContinuation'] = None
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization"""
@@ -73,7 +92,8 @@ class SpookyVariant:
             "supernatural_explanation": self.supernatural_explanation,
             "personalization_applied": self.personalization_applied,
             "generation_timestamp": self.generation_timestamp.isoformat(),
-            "variant_id": self.variant_id
+            "variant_id": self.variant_id,
+            "continuation": self.continuation.to_dict() if self.continuation else None
         }
 
 

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { StorageService } from '../services/storage';
 import type { UserPreferences } from '../types';
-
-const STORAGE_KEY = 'spooky_user_preferences';
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   preferred_horror_types: ['gothic', 'supernatural'],
@@ -28,20 +27,19 @@ const useUserPreferences = () => {
   // Load preferences from localStorage on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = StorageService.loadPreferences();
       if (stored) {
-        const parsedPreferences = JSON.parse(stored);
         // Merge with defaults to ensure all properties exist
         setPreferencesState({
           ...DEFAULT_PREFERENCES,
-          ...parsedPreferences,
+          ...stored,
           notification_settings: {
             ...DEFAULT_PREFERENCES.notification_settings,
-            ...parsedPreferences.notification_settings,
+            ...stored.notification_settings,
           },
           theme_customizations: {
             ...DEFAULT_PREFERENCES.theme_customizations,
-            ...parsedPreferences.theme_customizations,
+            ...stored.theme_customizations,
           },
         });
       }
@@ -57,7 +55,7 @@ const useUserPreferences = () => {
   const setPreferences = useCallback((newPreferences: UserPreferences) => {
     try {
       setPreferencesState(newPreferences);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newPreferences));
+      StorageService.savePreferences(newPreferences);
       setError(null);
     } catch (err) {
       console.error('Failed to save preferences to localStorage:', err);

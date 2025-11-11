@@ -1,0 +1,75 @@
+.spooky-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.spooky-spinner__animation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary, #8b5cf6);
+  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+}
+
+.spooky-spinner__ghost,
+.spooky-spinner__skull {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spooky-spinner__spiral {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spooky-spinner__spiral-ring {
+  position: absolute;
+  border: 3px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+}
+
+.spooky-spinner__message {
+  margin: 0;
+  color: var(--color-text-secondary, #d1d5db);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+/* Size variants */
+.spooky-spinner--small {
+  padding: 1rem;
+}
+
+.spooky-spinner--small .spooky-spinner__message {
+  font-size: 0.85rem;
+}
+
+.spooky-spinner--large {
+  padding: 3rem;
+}
+
+.spooky-spinner--large .spooky-spinner__message {
+  font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .spooky-spinner {
+    padding: 1.5rem;
+  }
+  
+  .spooky-spinner__message {
+    font-size: 0.875rem;
+  }
+}

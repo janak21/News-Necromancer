@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import useUserPreferences from '../hooks/useUserPreferences';
+import { useSoundEffects } from '../hooks';
 import { ApiService } from '../services/api';
+import { StorageService } from '../services/storage';
+import { useGhostNotificationContext } from '../contexts/GhostNotificationContext';
 import Button from '../components/Button/Button';
 import './PreferencesPage.css';
 
@@ -23,10 +26,35 @@ const CONTENT_FILTERS = [
   'Occult'
 ];
 
+const AMBIENT_PREFERENCE_KEY = 'spooky_ambient_enabled';
+
 const PreferencesPage: React.FC = () => {
   const { preferences, setPreferences, loading, error } = useUserPreferences();
+  const { showSuccess, showError, showInfo } = useGhostNotificationContext();
+  const { playSound, stopSound, toggleSound, setVolume, isEnabled, volume } = useSoundEffects();
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isAmbientPlaying, setIsAmbientPlaying] = useState(() => {
+    // Initialize from localStorage, default to true
+    const saved = localStorage.getItem(AMBIENT_PREFERENCE_KEY);
+    return saved === null ? true : saved === 'true';
+  });
+
+  // Play ambient sound when enabled
+  useEffect(() => {
+    if (isAmbientPlaying && isEnabled) {
+      playSound('ambient');
+    } else {
+      stopSound('ambient');
+    }
+  }, [isAmbientPlaying, isEnabled, playSound, stopSound]);
+
+  // Handle ambient toggle with persistence
+  const handleAmbientToggle = () => {
+    const newValue = !isAmbientPlaying;
+    setIsAmbientPlaying(newValue);
+    localStorage.setItem(AMBIENT_PREFERENCE_KEY, String(newValue));
+  };
 
   const handleHorrorTypeToggle = (horrorTypeValue: string) => {
     const updatedTypes = preferences.preferred_horror_types.includes(horrorTypeValue)
@@ -98,29 +126,26 @@ const PreferencesPage: React.FC = () => {
 
   return (
     <motion.div 
-      className="preferences-page"
+      className="preferences-page preferences-page--compact"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
       <div className="preferences-container">
-        <motion.h1 
-          className="preferences-title"
+        <motion.div
+          className="preferences-header"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          🎭 Cursed Preferences
-        </motion.h1>
-        
-        <motion.p 
-          className="preferences-subtitle"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          Customize how the darkness haunts your RSS feeds...
-        </motion.p>
+          <h1 className="preferences-title">
+            🎭 Cursed Preferences
+          </h1>
+          
+          <p className="preferences-subtitle">
+            Customize how the darkness haunts your RSS feeds...
+          </p>
+        </motion.div>
 
         {error && (
           <div className="error-message">
@@ -275,11 +300,145 @@ const PreferencesPage: React.FC = () => {
               ))}
             </div>
           </motion.section>
+
+          {/* Sound Effects Section */}
+          <motion.section 
+            className="preference-section"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9 }}
+          >
+            <h2>🔊 Sound Effects</h2>
+            <p className="section-description">
+              Control the whispers from beyond the veil...
+            </p>
+            <div className="sound-settings">
+              <motion.label
+                className={`sound-option ${isEnabled ? 'enabled' : ''}`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isEnabled}
+                  onChange={toggleSound}
+                />
+                <span className="sound-icon">{isEnabled ? '🔊' : '🔇'}</span>
+                <span className="sound-label">Enable Sound Effects</span>
+              </motion.label>
+
+              {isEnabled && (
+                <>
+                  <div className="volume-control">
+                    <span className="volume-label">Volume</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={volume}
+                      onChange={(e) => setVolume(parseFloat(e.target.value))}
+                      className="volume-slider"
+                    />
+                    <span className="volume-value">{Math.round(volume * 100)}%</span>
+                  </div>
+
+                  <motion.label
+                    className={`sound-option ${isAmbientPlaying ? 'enabled' : ''}`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isAmbientPlaying}
+                      onChange={handleAmbientToggle}
+                    />
+                    <span className="sound-icon">🎵</span>
+                    <span className="sound-label">Ambient Horror Loop</span>
+                  </motion.label>
+                </>
+              )}
+            </div>
+          </motion.section>
         </div>
 
-        {/* Save Button */}
+        {/* Data Management Section */}
+        <motion.section 
+          className="preference-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+        >
+          <h2>💾 Data Management</h2>
+          <p className="section-description">
+            Manage your haunted data and cursed memories...
+          </p>
+          <div className="data-management-actions">
+            <Button
+              onClick={() => {
+                const data = StorageService.exportData();
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `spooky-rss-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showSuccess('📦 Your cursed data has been exported to the mortal realm!');
+              }}
+              variant="secondary"
+            >
+              📦 Export Data
+            </Button>
+            
+            <Button
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      const data = event.target?.result as string;
+                      const success = StorageService.importData(data);
+                      if (success) {
+                        showSuccess('📥 Your cursed data has been summoned from the backup!');
+                        window.location.reload();
+                      } else {
+                        showError('💀 Failed to import data. The spirits reject this offering...');
+                      }
+                    };
+                    reader.readAsText(file);
+                  }
+                };
+                input.click();
+              }}
+              variant="secondary"
+            >
+              📥 Import Data
+            </Button>
+            
+            <Button
+              onClick={() => {
+                if (confirm('⚠️ This will permanently delete all your feeds and preferences. Are you sure you want to banish all cursed data?')) {
+                  StorageService.clearAll();
+                  showInfo('🌫️ All cursed data has been banished to the void...');
+                  setTimeout(() => window.location.reload(), 1500);
+                }
+              }}
+              variant="secondary"
+              style={{ background: 'rgba(220, 38, 38, 0.2)', borderColor: 'rgba(220, 38, 38, 0.4)' }}
+            >
+              🗑️ Clear All Data
+            </Button>
+          </div>
+        </motion.section>
+
+        {/* Save Button - Sticky */}
         <motion.div 
-          className="save-section"
+          className="save-section save-section--sticky"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0 }}

@@ -1,16 +1,22 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Ghost, Rss, Settings } from 'lucide-react';
+import { useSoundEffects } from '../../hooks';
 import './Navigation.css';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
+  const { playSound } = useSoundEffects();
 
   const navItems = [
     { path: '/', label: 'Home', icon: Ghost },
     { path: '/feeds', label: 'Spooky Feeds', icon: Rss },
     { path: '/preferences', label: 'Preferences', icon: Settings },
   ];
+
+  const handleNavClick = () => {
+    playSound('creak');
+  };
 
   return (
     <nav className="navigation">
@@ -24,6 +30,7 @@ const Navigation: React.FC = () => {
             <Link
               to={path}
               className={`nav-link ${location.pathname === path ? 'active' : ''}`}
+              onClick={handleNavClick}
             >
               <Icon size={18} />
               <span>{label}</span>

@@ -9,7 +9,7 @@ import logging
 import uuid
 from datetime import datetime
 
-from ...models.data_models import ProcessingResponse, SpookyVariant, UserPreferences
+from ...models.data_models import ProcessingResponse, SpookyVariant, UserPreferences, StoryContinuation
 from ...fetcher.concurrent_fetcher import ConcurrentFetcher
 from ...remixer.spooky_remixer import SpookyRemixer
 from ..dependencies import get_fetcher, get_remixer, get_integration_manager
@@ -24,6 +24,7 @@ class FeedProcessingRequest(BaseModel):
     urls: List[HttpUrl]
     user_preferences: Optional[UserPreferences] = None
     variant_count: int = 2
+    intensity: Optional[int] = None  # Override intensity level (1-5)
 
 class FeedProcessingResponse(BaseModel):
     """Response model for feed processing"""
@@ -37,6 +38,7 @@ class FeedProcessingResponse(BaseModel):
 
 # In-memory storage for demo (would use Redis/database in production)
 processing_results = {}
+continuation_cache = {}  # Cache for story continuations
 
 @router.post("/process", response_model=FeedProcessingResponse)
 async def process_feeds(
@@ -65,7 +67,8 @@ async def process_feeds(
         response = await integration_manager.process_feeds_integrated(
             urls=urls,
             user_preferences=request.user_preferences,
-            variant_count=request.variant_count
+            variant_count=request.variant_count,
+            intensity=request.intensity
         )
         
         # Store results for later retrieval (backward compatibility)
@@ -340,3 +343,151 @@ async def get_integration_health(
             status_code=500,
             detail=f"Failed to check integration health: {str(e)}"
         )
+
+
+@router.post("/variants/{variant_id}/continue")
+async def continue_story(
+    variant_id: str,
+    continuation_length: Optional[int] = 500,
+    remixer: SpookyRemixer = Depends(get_remixer)
+):
+    """
+    Generate a story continuation for a specific variant
+    
+    Args:
+        variant_id: Variant identifier
+        continuation_length: Target length in words (300-500)
+        remixer: SpookyRemixer instance
+        
+    Returns:
+        StoryContinuation object with extended narrative
+    """
+    try:
+        # Check cache first
+        cache_key = f"{variant_id}_{continuation_length}"
+        if cache_key in continuation_cache:
+            logger.info(f"Returning cached continuation for variant {variant_id}")
+            cached_continuation = continuation_cache[cache_key]
+            return {
+                "success": True,
+                "variant_id": variant_id,
+                "continuation": cached_continuation.to_dict()
+            }
+        
+        # Find the variant in processing results
+        variant = None
+        for processing_id, result in processing_results.items():
+            for v in result["variants"]:
+                if v.variant_id == variant_id:
+                    variant = v
+                    break
+            if variant:
+                break
+        
+        if not variant:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Variant {variant_id} not found"
+            )
+        
+        logger.info(f"🌙 Generating story continuation for variant {variant_id}")
+        
+        # Generate continuation
+        continuation = remixer.continue_story(
+            variant=variant,
+            continuation_length=continuation_length
+        )
+        
+        # Cache the continuation
+        continuation_cache[cache_key] = continuation
+        
+        logger.info(f"✨ Successfully generated continuation for variant {variant_id}")
+        
+        return {
+            "success": True,
+            "variant_id": variant_id,
+            "continuation": continuation.to_dict()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"💀 Error generating continuation: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate story continuation: {str(e)}"
+        )
+
+
+@router.get("/variants/{variant_id}/continuation")
+async def get_cached_continuation(variant_id: str, continuation_length: Optional[int] = 500):
+    """
+    Retrieve a cached story continuation if available
+    
+    Args:
+        variant_id: Variant identifier
+        continuation_length: Target length used for caching
+        
+    Returns:
+        Cached continuation or 404 if not found
+    """
+    cache_key = f"{variant_id}_{continuation_length}"
+    
+    if cache_key not in continuation_cache:
+        raise HTTPException(
+            status_code=404,
+            detail="Continuation not found in cache"
+        )
+    
+    continuation = continuation_cache[cache_key]
+    
+    return {
+        "success": True,
+        "variant_id": variant_id,
+        "continuation": continuation.to_dict(),
+        "cached": True
+    }
+
+
+@router.delete("/variants/{variant_id}/continuation")
+async def clear_continuation_cache(variant_id: str):
+    """
+    Clear cached continuations for a specific variant
+    
+    Args:
+        variant_id: Variant identifier
+        
+    Returns:
+        Deletion confirmation
+    """
+    cleared_count = 0
+    keys_to_delete = []
+    
+    for cache_key in continuation_cache.keys():
+        if cache_key.startswith(variant_id):
+            keys_to_delete.append(cache_key)
+    
+    for key in keys_to_delete:
+        del continuation_cache[key]
+        cleared_count += 1
+    
+    return {
+        "success": True,
+        "message": f"Cleared {cleared_count} cached continuations for variant {variant_id}",
+        "cleared_count": cleared_count
+    }
+
+
+@router.get("/continuations/stats")
+async def get_continuation_stats():
+    """
+    Get statistics about cached continuations
+    
+    Returns:
+        Continuation cache statistics
+    """
+    return {
+        "success": True,
+        "total_cached": len(continuation_cache),
+        "cache_keys": list(continuation_cache.keys())
+    }

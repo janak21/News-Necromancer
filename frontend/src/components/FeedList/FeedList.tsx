@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpookyCard from '../SpookyCard/SpookyCard';
-import type { SpookyVariant, SpookyFeed } from '../../types';
+import type { SpookyVariant, SpookyFeed, StoryContinuation } from '../../types';
 import './FeedList.css';
 
 export interface FeedListProps {
   feeds: SpookyFeed[];
   onVariantSelect?: (variant: SpookyVariant) => void;
+  onFeedDelete?: (feedId: string) => void;
+  onContinueStory?: (variantId: string) => Promise<StoryContinuation>;
   showFilters?: boolean;
   compactView?: boolean;
   maxItemsPerFeed?: number;
@@ -18,6 +20,8 @@ type FilterOption = 'all' | 'personalized' | 'recent';
 const FeedList: React.FC<FeedListProps> = ({
   feeds,
   onVariantSelect,
+  onFeedDelete,
+  onContinueStory,
   showFilters = true,
   compactView = false,
   maxItemsPerFeed = 5
@@ -38,12 +42,18 @@ const FeedList: React.FC<FeedListProps> = ({
     return Array.from(themes).sort();
   }, [feeds]);
 
-  // Get all variants from all feeds
+  // Get all variants from all feeds with feed info
   const allVariants = useMemo(() => {
-    const variants: SpookyVariant[] = [];
+    const variants: (SpookyVariant & { feedId: string; feedTitle: string })[] = [];
     feeds.forEach(feed => {
       const feedVariants = feed.variants.slice(0, maxItemsPerFeed);
-      variants.push(...feedVariants);
+      feedVariants.forEach(variant => {
+        variants.push({
+          ...variant,
+          feedId: feed.id,
+          feedTitle: feed.title
+        });
+      });
     });
     return variants;
   }, [feeds, maxItemsPerFeed]);
@@ -174,8 +184,16 @@ const FeedList: React.FC<FeedListProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.4 }}
           >
-            Add some RSS feeds to start generating haunted variants of your favorite content.
+            Add some RSS feeds above to start generating haunted variants of your favorite content.
           </motion.p>
+          <motion.div
+            className="feed-list__empty-hint"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.4 }}
+          >
+            💡 Tip: Try one of the sample feeds to get started quickly!
+          </motion.div>
         </motion.div>
       </motion.div>
     );
@@ -266,17 +284,88 @@ const FeedList: React.FC<FeedListProps> = ({
         </motion.div>
       )}
 
+      {/* Feed Management Section */}
+      {onFeedDelete && feeds.length > 0 && (
+        <motion.div 
+          className="feed-list__feeds"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <div className="feed-list__feeds-header">
+            <h3 className="feed-list__feeds-title">📡 Your Feeds ({feeds.length})</h3>
+            {feeds.length > 1 && (
+              <button
+                onClick={() => {
+                  const totalVariants = feeds.reduce((sum, feed) => sum + feed.variants.length, 0);
+                  const message = `⚠️ DELETE ALL FEEDS?\n\nThis will permanently remove:\n• ${feeds.length} feed${feeds.length !== 1 ? 's' : ''}\n• ${totalVariants} spooky variant${totalVariants !== 1 ? 's' : ''}\n• All associated data\n\nThis action cannot be undone!\n\nType "DELETE" to confirm.`;
+                  const confirmation = prompt(message);
+                  if (confirmation === 'DELETE') {
+                    feeds.forEach(feed => onFeedDelete(feed.id));
+                  } else if (confirmation !== null) {
+                    alert('Deletion cancelled. You must type "DELETE" exactly to confirm.');
+                  }
+                }}
+                className="feed-list__feeds-delete-all"
+                title="Delete all feeds (requires confirmation)"
+                type="button"
+              >
+                🗑️ Delete All
+              </button>
+            )}
+          </div>
+          <div className="feed-list__feeds-grid">
+            <AnimatePresence mode="popLayout">
+              {feeds.map((feed) => (
+                <motion.div
+                  key={feed.id}
+                  className="feed-list__feed-item"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20, height: 0, marginBottom: 0 }}
+                  transition={{ duration: 0.3 }}
+                  layout
+                >
+                  <div className="feed-list__feed-info">
+                    <span className="feed-list__feed-title">{feed.title}</span>
+                    <span className="feed-list__feed-url">{feed.url}</span>
+                    <span className="feed-list__feed-meta">
+                      {feed.variants.length} variant{feed.variants.length !== 1 ? 's' : ''} • 
+                      Updated {new Date(feed.last_updated).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const variantCount = feed.variants.length;
+                      const message = `Delete "${feed.title}"?\n\nThis will permanently remove:\n• ${variantCount} spooky variant${variantCount !== 1 ? 's' : ''}\n• All associated data\n\nThis action cannot be undone.`;
+                      if (confirm(message)) {
+                        onFeedDelete(feed.id);
+                      }
+                    }}
+                    className="feed-list__feed-delete"
+                    title="Delete this feed and all its variants"
+                    type="button"
+                  >
+                    🗑️
+                  </button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
+
       <motion.div 
         className="feed-list__results"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
       >
         <motion.div 
           className="feed-list__results-header"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
         >
           <motion.span 
             className="feed-list__results-count"
@@ -309,6 +398,7 @@ const FeedList: React.FC<FeedListProps> = ({
                 <SpookyCard
                   variant={variant}
                   onReadMore={onVariantSelect}
+                  onContinueStory={onContinueStory}
                   compact={compactView}
                 />
               </motion.div>
