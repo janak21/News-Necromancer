@@ -28,12 +28,12 @@
 
 .ghost-notification__body {
   position: relative;
-  background: var(--color-surface-elevated);
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
+  background: rgba(22, 22, 29, 0.98);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-xl);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(16px);
   overflow: hidden;
 }
 
@@ -46,9 +46,9 @@
   bottom: 0;
   background: linear-gradient(
     135deg,
-    rgba(139, 92, 246, 0.1) 0%,
+    rgba(167, 139, 250, 0.08) 0%,
     transparent 50%,
-    rgba(139, 92, 246, 0.05) 100%
+    rgba(167, 139, 250, 0.04) 100%
   );
   pointer-events: none;
 }
@@ -92,7 +92,8 @@
   font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
   margin: 0;
-  text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.01em;
 }
 
 .ghost-notification__particles {
@@ -177,8 +178,8 @@
 
 /* Hover effects */
 .ghost-notification:hover .ghost-notification__body {
-  transform: scale(1.02);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.7), 0 16px 24px -8px rgba(167, 139, 250, 0.3);
   transition: all var(--transition-normal);
 }
 

@@ -46,13 +46,13 @@
 
 /* Controls */
 .feed-list__controls {
-  background: rgba(20, 20, 30, 0.8);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  border-radius: 10px;
-  padding: 1rem;
+  background: rgba(22, 22, 29, 0.9);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.1);
-  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
 }
 
 .feed-list__search {
@@ -61,20 +61,21 @@
 
 .feed-list__search-input {
   width: 100%;
-  background: rgba(10, 10, 20, 0.8);
-  border: 2px solid rgba(139, 92, 246, 0.3);
-  border-radius: 8px;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.9rem;
-  color: #ffffff;
-  transition: all 0.3s ease;
+  background: rgba(10, 10, 15, 0.9);
+  border: 1.5px solid rgba(167, 139, 250, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  transition: all var(--transition-normal);
+  font-family: var(--font-family-sans);
 }
 
 .feed-list__search-input:focus {
   outline: none;
-  border-color: rgba(139, 92, 246, 0.6);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-  background: rgba(10, 10, 20, 0.95);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
+  background: rgba(10, 10, 15, 1);
 }
 
 .feed-list__search-input::placeholder {
@@ -106,31 +107,32 @@
 }
 
 .feed-list__filter-select {
-  background: rgba(10, 10, 20, 0.8);
-  border: 2px solid rgba(139, 92, 246, 0.3);
-  border-radius: 6px;
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8rem;
-  color: #ffffff;
+  background: rgba(10, 10, 15, 0.9);
+  border: 1.5px solid rgba(167, 139, 250, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.875rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 110px;
+  transition: all var(--transition-normal);
+  min-width: 120px;
+  font-family: var(--font-family-sans);
 }
 
 .feed-list__filter-select option {
-  background: rgba(10, 10, 20, 0.98);
-  color: #ffffff;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .feed-list__filter-select:hover {
-  border-color: rgba(139, 92, 246, 0.5);
-  background: rgba(10, 10, 20, 0.95);
+  border-color: rgba(167, 139, 250, 0.4);
+  background: rgba(10, 10, 15, 1);
 }
 
 .feed-list__filter-select:focus {
   outline: none;
-  border-color: rgba(139, 92, 246, 0.6);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
 }
 
 .feed-list__clear-filters {
@@ -174,31 +176,33 @@
 }
 
 .feed-list__theme-tag {
-  background: rgba(10, 10, 20, 0.6);
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  border-radius: 16px;
-  padding: 0.25rem 0.625rem;
-  font-size: 0.75rem;
+  background: rgba(167, 139, 250, 0.1);
+  color: var(--color-text-secondary);
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: var(--radius-full);
+  padding: 0.375rem 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
   text-transform: capitalize;
+  backdrop-filter: blur(8px);
 }
 
 .feed-list__theme-tag:hover {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.5);
-  color: #ffffff;
+  background: rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.4);
+  color: var(--color-text);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .feed-list__theme-tag--active {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(168, 85, 247, 0.3));
-  color: #ffffff;
-  border-color: rgba(139, 92, 246, 0.6);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 4px 12px rgba(139, 92, 246, 0.3);
+  background: rgba(167, 139, 250, 0.25);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.3);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* Results */

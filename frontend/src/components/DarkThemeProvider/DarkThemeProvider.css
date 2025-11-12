@@ -1,79 +1,82 @@
 /* Dark Theme CSS Variables and Base Styles */
 
 :root.dark-theme {
-  /* Color Palette - Spooky Dark Theme */
-  --color-primary: #8b5cf6;          /* Deep purple */
-  --color-secondary: #6366f1;        /* Indigo */
-  --color-background: #0f0f0f;       /* Almost black */
-  --color-surface: #1a1a1a;          /* Dark gray */
-  --color-surface-elevated: #262626;  /* Slightly lighter surface */
-  --color-text: #f5f5f5;             /* Off-white */
-  --color-text-secondary: #a3a3a3;   /* Gray text */
-  --color-text-muted: #737373;       /* Muted gray */
-  --color-accent: #f59e0b;           /* Amber accent */
-  --color-danger: #ef4444;           /* Red */
-  --color-success: #10b981;          /* Green */
-  --color-warning: #f59e0b;          /* Amber */
+  /* Color Palette - Refined Spooky Dark Theme */
+  --color-primary: #a78bfa;          /* Softer purple for better readability */
+  --color-secondary: #818cf8;        /* Softer indigo */
+  --color-background: #0a0a0f;       /* Deeper black with blue tint */
+  --color-surface: #16161d;          /* Refined dark surface */
+  --color-surface-elevated: #1f1f2e;  /* More contrast */
+  --color-text: #fafafa;             /* Brighter white */
+  --color-text-secondary: #b4b4c8;   /* Better contrast gray */
+  --color-text-muted: #7a7a8e;       /* Refined muted */
+  --color-accent: #fbbf24;           /* Warmer amber */
+  --color-danger: #f87171;           /* Softer red */
+  --color-success: #34d399;          /* Brighter green */
+  --color-warning: #fbbf24;          /* Warmer amber */
   
   /* Spooky Theme Colors */
   --color-ghost: #e5e7eb;            /* Ghost white */
   --color-shadow: #000000;           /* Pure black */
-  --color-mist: rgba(139, 92, 246, 0.1); /* Purple mist */
-  --color-glow: rgba(139, 92, 246, 0.3); /* Purple glow */
-  --color-blood: #dc2626;            /* Blood red */
+  --color-mist: rgba(167, 139, 250, 0.08); /* Softer purple mist */
+  --color-glow: rgba(167, 139, 250, 0.25); /* Refined glow */
+  --color-blood: #ef4444;            /* Blood red */
   --color-bone: #f3f4f6;             /* Bone white */
   
-  /* Spacing Scale */
-  --spacing-xs: 0.25rem;   /* 4px */
-  --spacing-sm: 0.5rem;    /* 8px */
+  /* Spacing Scale - 8pt grid system */
+  --spacing-xs: 0.5rem;    /* 8px */
+  --spacing-sm: 0.75rem;   /* 12px */
   --spacing-md: 1rem;      /* 16px */
   --spacing-lg: 1.5rem;    /* 24px */
   --spacing-xl: 2rem;      /* 32px */
   --spacing-2xl: 3rem;     /* 48px */
   --spacing-3xl: 4rem;     /* 64px */
+  --spacing-4xl: 6rem;     /* 96px */
   
-  /* Border Radius */
-  --radius-sm: 0.25rem;    /* 4px */
-  --radius-md: 0.5rem;     /* 8px */
-  --radius-lg: 0.75rem;    /* 12px */
-  --radius-xl: 1rem;       /* 16px */
+  /* Border Radius - Refined curves */
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-md: 0.625rem;   /* 10px */
+  --radius-lg: 0.875rem;   /* 14px */
+  --radius-xl: 1.125rem;   /* 18px */
+  --radius-2xl: 1.5rem;    /* 24px */
   --radius-full: 9999px;   /* Full circle */
   
-  /* Shadows - Spooky themed */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(139, 92, 246, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(139, 92, 246, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(139, 92, 246, 0.1);
-  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
-  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+  /* Shadows - Refined depth system */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(167, 139, 250, 0.15);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.5), 0 4px 8px -2px rgba(167, 139, 250, 0.2);
+  --shadow-xl: 0 24px 48px -8px rgba(0, 0, 0, 0.6), 0 12px 16px -4px rgba(167, 139, 250, 0.25);
+  --shadow-glow: 0 0 24px rgba(167, 139, 250, 0.4), 0 0 12px rgba(167, 139, 250, 0.2);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
   
-  /* Typography */
-  --font-family-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-mono: 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+  /* Typography - Refined scale */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Inter', system-ui, sans-serif;
+  --font-family-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
   --font-family-spooky: 'Creepster', 'Chiller', cursive;
   
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.875rem;   /* 14px */
-  --font-size-base: 1rem;     /* 16px */
-  --font-size-lg: 1.125rem;   /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 1.875rem;  /* 30px */
-  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-xs: 0.8125rem;  /* 13px */
+  --font-size-sm: 0.9375rem;  /* 15px */
+  --font-size-base: 1.0625rem; /* 17px - Apple's sweet spot */
+  --font-size-lg: 1.1875rem;  /* 19px */
+  --font-size-xl: 1.375rem;   /* 22px */
+  --font-size-2xl: 1.625rem;  /* 26px */
+  --font-size-3xl: 2rem;      /* 32px */
+  --font-size-4xl: 2.5rem;    /* 40px */
   
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   
-  --line-height-tight: 1.25;
+  --line-height-tight: 1.2;
   --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  --line-height-relaxed: 1.7;
   
-  /* Transitions */
-  --transition-fast: 150ms ease-in-out;
-  --transition-normal: 250ms ease-in-out;
-  --transition-slow: 350ms ease-in-out;
+  /* Transitions - Apple-like timing */
+  --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
   
   /* Z-Index Scale */
   --z-dropdown: 1000;
@@ -105,44 +108,58 @@
 
 /* Scrollbar Styling */
 .spooky-theme-root ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 .spooky-theme-root ::-webkit-scrollbar-track {
-  background: var(--color-surface);
+  background: rgba(22, 22, 29, 0.8);
   border-radius: var(--radius-md);
 }
 
 .spooky-theme-root ::-webkit-scrollbar-thumb {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
+  border: 2px solid rgba(22, 22, 29, 0.8);
+  transition: all var(--transition-fast);
 }
 
 .spooky-theme-root ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-secondary);
+  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
 }
 
 /* Selection Styling */
 .spooky-theme-root ::selection {
-  background-color: var(--color-primary);
+  background-color: rgba(167, 139, 250, 0.3);
   color: var(--color-text);
 }
 
 .spooky-theme-root ::-moz-selection {
-  background-color: var(--color-primary);
+  background-color: rgba(167, 139, 250, 0.3);
   color: var(--color-text);
 }
 
 /* Focus Styles */
-.spooky-theme-root *:focus {
+.spooky-theme-root *:focus-visible {
   outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
 }
 
 .spooky-theme-root *:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Better focus for interactive elements */
+.spooky-theme-root button:focus-visible,
+.spooky-theme-root a:focus-visible,
+.spooky-theme-root input:focus-visible,
+.spooky-theme-root select:focus-visible,
+.spooky-theme-root textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.15);
 }
 
 /* Responsive Design Breakpoints */

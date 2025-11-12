@@ -3,27 +3,33 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: rgba(22, 22, 29, 0.95);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.15);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  font-weight: bold;
+  gap: 0.625rem;
+  color: var(--color-primary);
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.02em;
 }
 
 .brand-icon {
   animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.4));
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-6px); }
 }
 
 .nav-links {
@@ -31,29 +37,50 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
+  gap: 0.5rem;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  color: var(--text-secondary);
+  padding: 0.625rem 1rem;
+  color: var(--color-text-secondary);
   text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  position: relative;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  background: rgba(167, 139, 250, 0.1);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
 }
 
 .nav-link:hover {
-  color: var(--text-primary);
-  background: var(--bg-hover);
-  transform: translateY(-2px);
+  color: var(--color-text);
+  transform: translateY(-1px);
+}
+
+.nav-link:hover::before {
+  opacity: 1;
 }
 
 .nav-link.active {
-  color: var(--accent-color);
-  background: var(--bg-active);
+  color: var(--color-primary);
+  background: rgba(167, 139, 250, 0.15);
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.2);
+}
+
+.nav-link.active::before {
+  opacity: 0;
 }
 
 .nav-auth {
