@@ -23,21 +23,23 @@ class handler(BaseHTTPRequestHandler):
             # TODO: Implement actual RSS fetching and processing
             processing_id = str(uuid.uuid4())
             
-            # Create mock variants with proper structure
+            # Create mock variants with proper structure matching frontend expectations
             mock_variants = []
             for i in range(min(len(urls) * variant_count, 5)):
                 mock_variants.append({
-                    "id": str(uuid.uuid4()),
-                    "feed_id": str(uuid.uuid4()),
-                    "title": f"The Haunting of Story {i+1}",
-                    "spooky_title": f"The Cursed Tale of Horror {i+1}",
-                    "original_content": "Original news content here...",
-                    "spooky_content": "A dark and twisted version of the story unfolds... The shadows whisper secrets of terror that lurk in the darkness. This is a mock spooky variant. Real processing coming soon!",
-                    "intensity_level": 3,
+                    "variant_id": str(uuid.uuid4()),
+                    "original_item": {
+                        "title": f"Original News Story {i+1}",
+                        "summary": "This is the original news content before transformation.",
+                        "link": urls[0] if urls else "https://example.com",
+                        "published": datetime.now().isoformat()
+                    },
+                    "haunted_title": f"🕷️ The Cursed Tale of Horror {i+1}",
+                    "haunted_summary": "A dark and twisted version unfolds... The shadows whisper secrets of terror that lurk in the darkness. Ancient evils stir in the depths, waiting to consume the unwary. This is a mock spooky variant - real processing coming soon!",
                     "horror_themes": ["supernatural", "psychological", "gothic"],
-                    "transformation_notes": "Applied horror transformation",
-                    "created_at": datetime.now().isoformat(),
-                    "source_url": urls[0] if urls else "https://example.com"
+                    "supernatural_explanation": "The spirits of the damned have possessed this story, twisting reality into nightmare.",
+                    "personalization_applied": True,
+                    "generation_timestamp": datetime.now().isoformat()
                 })
             
             response = {
