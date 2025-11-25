@@ -9,6 +9,10 @@
       }
     },
     {
+      "src": "api/test.py",
+      "use": "@vercel/python"
+    },
+    {
       "src": "api/health.py",
       "use": "@vercel/python",
       "config": {
@@ -31,6 +35,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/api/test",
+      "dest": "/api/test.py"
+    },
     {
       "src": "/api/health",
       "dest": "/api/health.py"
