@@ -23,22 +23,31 @@ class handler(BaseHTTPRequestHandler):
             # TODO: Implement actual RSS fetching and processing
             processing_id = str(uuid.uuid4())
             
+            # Create mock variants with proper structure
+            mock_variants = []
+            for i in range(min(len(urls) * variant_count, 5)):
+                mock_variants.append({
+                    "id": str(uuid.uuid4()),
+                    "feed_id": str(uuid.uuid4()),
+                    "title": f"The Haunting of Story {i+1}",
+                    "spooky_title": f"The Cursed Tale of Horror {i+1}",
+                    "original_content": "Original news content here...",
+                    "spooky_content": "A dark and twisted version of the story unfolds... The shadows whisper secrets of terror that lurk in the darkness. This is a mock spooky variant. Real processing coming soon!",
+                    "intensity_level": 3,
+                    "horror_themes": ["supernatural", "psychological", "gothic"],
+                    "transformation_notes": "Applied horror transformation",
+                    "created_at": datetime.now().isoformat(),
+                    "source_url": urls[0] if urls else "https://example.com"
+                })
+            
             response = {
                 "success": True,
                 "message": f"Processing {len(urls)} feeds (mock response)",
                 "processing_id": processing_id,
                 "total_feeds": len(urls),
-                "total_variants": len(urls) * variant_count,
+                "total_variants": len(mock_variants),
                 "processing_time": 0.1,
-                "variants": [
-                    {
-                        "id": str(uuid.uuid4()),
-                        "title": f"Spooky Story {i+1}",
-                        "content": "This is a mock spooky variant. Real processing coming soon!",
-                        "intensity": 3
-                    }
-                    for i in range(min(len(urls) * variant_count, 5))
-                ]
+                "variants": mock_variants
             }
             
             self.send_response(200)
