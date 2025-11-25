@@ -75,7 +75,8 @@ const FeedList: React.FC<FeedListProps> = ({
             feedId: feed.id,
             feedTitle: feed.title
           });
-      });
+        });
+      }
     });
     return variants;
   }, [feeds, maxItemsPerFeed]);
