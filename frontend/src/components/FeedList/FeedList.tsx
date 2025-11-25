@@ -52,7 +52,7 @@ const FeedList: React.FC<FeedListProps> = ({
     const themes = new Set<string>();
     feeds.forEach(feed => {
       feed.variants.forEach(variant => {
-        variant.horror_themes.forEach(theme => themes.add(theme));
+        variant.horror_themes?.forEach(theme => themes.add(theme));
       });
     });
     return Array.from(themes).sort();
@@ -85,7 +85,7 @@ const FeedList: React.FC<FeedListProps> = ({
         variant.haunted_title.toLowerCase().includes(query) ||
         variant.haunted_summary.toLowerCase().includes(query) ||
         variant.original_item.source.toLowerCase().includes(query) ||
-        variant.horror_themes.some(theme => theme.toLowerCase().includes(query))
+        variant.horror_themes?.some(theme => theme.toLowerCase().includes(query))
       );
     }
 
@@ -108,7 +108,7 @@ const FeedList: React.FC<FeedListProps> = ({
     // Apply theme filter
     if (selectedThemes.length > 0) {
       filtered = filtered.filter(variant =>
-        variant.horror_themes.some(theme => selectedThemes.includes(theme))
+        variant.horror_themes?.some(theme => selectedThemes.includes(theme))
       );
     }
 
@@ -133,7 +133,7 @@ const FeedList: React.FC<FeedListProps> = ({
         break;
       case 'themes':
         filtered.sort((a, b) => 
-          a.horror_themes.length - b.horror_themes.length
+          (a.horror_themes?.length || 0) - (b.horror_themes?.length || 0)
         );
         break;
     }
