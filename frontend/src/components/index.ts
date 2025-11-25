@@ -27,6 +27,7 @@ export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary';
 
 // Feed Components
 export { default as FeedList } from './FeedList/FeedList';
+export { default as FilterResults } from './FilterResults/FilterResults';
 
 // Preferences
 export { default as PreferencesPanel } from './PreferencesPanel/PreferencesPanel';
@@ -36,3 +37,7 @@ export { default as IntensitySlider } from './IntensitySlider';
 export { default as SpookySpinner } from './SpookySpinner';
 export { default as SkeletonLoader, SkeletonCard, SkeletonFeedList } from './SkeletonLoader';
 export { default as LoadingState } from './LoadingState';
+
+// Narration Components
+export { default as VoiceStyleSelector } from './VoiceStyleSelector';
+export { default as AudioPlayer } from './AudioPlayer';

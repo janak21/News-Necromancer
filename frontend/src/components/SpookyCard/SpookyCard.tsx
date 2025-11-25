@@ -3,7 +3,9 @@ import { motion } from 'framer-motion';
 import Card from '../Card/Card';
 import SupernaturalReveal from '../SupernaturalReveal';
 import StoryContinuation from '../StoryContinuation';
+import AudioPlayer from '../AudioPlayer/AudioPlayer';
 import type { SpookyVariant, StoryContinuation as StoryContinuationType } from '../../types';
+import { VoiceStyle } from '../../types/narration';
 import { useSoundEffects } from '../../hooks';
 import './SpookyCard.css';
 
@@ -24,6 +26,7 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const { playSound } = useSoundEffects();
   const formatDate = (dateString: string) => {
     try {
@@ -67,6 +70,41 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
         playSound('creak');
       }
     }
+  };
+
+  const handleAudioPlayerToggle = () => {
+    setShowAudioPlayer(!showAudioPlayer);
+    if (!showAudioPlayer) {
+      playSound('whisper');
+    }
+  };
+
+  // Get default voice style based on horror themes
+  const getDefaultVoiceStyle = (): VoiceStyle => {
+    const themes = variant.horror_themes.map(t => t.toLowerCase());
+    
+    if (themes.some(t => t.includes('ghost') || t.includes('spirit'))) {
+      return VoiceStyle.GHOSTLY_WHISPER;
+    }
+    if (themes.some(t => t.includes('demon') || t.includes('evil'))) {
+      return VoiceStyle.DEMONIC_GROWL;
+    }
+    if (themes.some(t => t.includes('child') || t.includes('innocent'))) {
+      return VoiceStyle.POSSESSED_CHILD;
+    }
+    if (themes.some(t => t.includes('ancient') || t.includes('old') || t.includes('elder'))) {
+      return VoiceStyle.ANCIENT_ENTITY;
+    }
+    
+    // Default to eerie narrator
+    return VoiceStyle.EERIE_NARRATOR;
+  };
+
+  // Get intensity level (default to 3 if not available)
+  const getIntensityLevel = (): number => {
+    // Could be derived from user preferences or variant metadata
+    // For now, use a default of 3 (medium intensity)
+    return 3;
   };
 
   return (
@@ -197,6 +235,56 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
           </motion.div>
         )}
       </motion.div>
+
+      {/* Audio Player Section */}
+      {!compact && (
+        <motion.div
+          className="spooky-content-card__audio-section"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.85, duration: 0.4 }}
+        >
+          <motion.button
+            className="spooky-content-card__audio-toggle"
+            onClick={handleAudioPlayerToggle}
+            type="button"
+            whileHover={{ 
+              scale: 1.05,
+              transition: { duration: 0.2 }
+            }}
+            whileTap={{ 
+              scale: 0.95,
+              transition: { duration: 0.1 }
+            }}
+            aria-expanded={showAudioPlayer}
+            aria-label={showAudioPlayer ? "Hide audio player" : "Show audio player"}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            {showAudioPlayer ? 'Hide Narration' : 'Listen to Narration'}
+          </motion.button>
+
+          {showAudioPlayer && (
+            <motion.div
+              className="spooky-content-card__audio-player-container"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AudioPlayer
+                variantId={variant.variant_id || `${variant.original_item.source}-${variant.generation_timestamp}`}
+                voiceStyle={getDefaultVoiceStyle()}
+                intensity={getIntensityLevel()}
+                content={variant.haunted_summary}
+                autoPlay={false}
+                className="spooky-content-card__audio-player"
+              />
+            </motion.div>
+          )}
+        </motion.div>
+      )}
 
       <motion.div 
         className="spooky-content-card__footer"

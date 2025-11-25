@@ -11,15 +11,46 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary, #8b5cf6);
-  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+  color: var(--color-primary, #a78bfa);
+  /* Performance optimization: use will-change sparingly */
+  will-change: transform;
 }
 
-.spooky-spinner__ghost,
+/* Ghost variant - ethereal floating effect */
+.spooky-spinner--ghost .spooky-spinner__animation {
+  filter: drop-shadow(0 0 15px rgba(167, 139, 250, 0.6))
+          drop-shadow(0 0 30px rgba(167, 139, 250, 0.3));
+}
+
+.spooky-spinner__ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* GPU acceleration for smooth animation */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Skull variant - ominous rotating effect */
+.spooky-spinner--skull .spooky-spinner__animation {
+  color: var(--color-bone, #f3f4f6);
+  filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.5))
+          drop-shadow(0 0 25px rgba(239, 68, 68, 0.3));
+}
+
 .spooky-spinner__skull {
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Spiral variant - hypnotic swirling effect */
+.spooky-spinner--spiral .spooky-spinner__animation {
+  color: var(--color-secondary, #818cf8);
+  filter: drop-shadow(0 0 18px rgba(129, 140, 248, 0.7))
+          drop-shadow(0 0 35px rgba(129, 140, 248, 0.4));
 }
 
 .spooky-spinner__spiral {
@@ -27,40 +58,77 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: translateZ(0);
 }
 
 .spooky-spinner__spiral-ring {
   position: absolute;
   border: 3px solid currentColor;
   border-top-color: transparent;
+  border-right-color: transparent;
   border-radius: 50%;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .spooky-spinner__message {
   margin: 0;
-  color: var(--color-text-secondary, #d1d5db);
+  color: var(--color-text-secondary, #b4b4c8);
   font-size: 0.95rem;
   font-weight: 500;
   text-align: center;
   letter-spacing: 0.5px;
-  text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+  text-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
 }
 
 /* Size variants */
 .spooky-spinner--small {
   padding: 1rem;
+  gap: 0.75rem;
 }
 
 .spooky-spinner--small .spooky-spinner__message {
   font-size: 0.85rem;
 }
 
+.spooky-spinner--small .spooky-spinner__animation {
+  filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.5));
+}
+
 .spooky-spinner--large {
   padding: 3rem;
+  gap: 1.5rem;
 }
 
 .spooky-spinner--large .spooky-spinner__message {
   font-size: 1.1rem;
+}
+
+.spooky-spinner--large .spooky-spinner__animation {
+  filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.7))
+          drop-shadow(0 0 40px rgba(167, 139, 250, 0.4));
+}
+
+/* Reduced motion support */
+.spooky-spinner--reduced-motion {
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spooky-spinner__animation {
+    filter: none !important;
+  }
+  
+  .spooky-spinner__ghost,
+  .spooky-spinner__skull,
+  .spooky-spinner__spiral {
+    animation: none !important;
+  }
+  
+  .spooky-spinner__message {
+    text-shadow: none;
+  }
 }
 
 /* Responsive adjustments */
@@ -71,5 +139,32 @@
   
   .spooky-spinner__message {
     font-size: 0.875rem;
+  }
+  
+  /* Reduce glow effects on mobile for performance */
+  .spooky-spinner__animation {
+    filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.5));
+  }
+}
+
+@media (max-width: 480px) {
+  .spooky-spinner {
+    padding: 1rem;
+  }
+  
+  .spooky-spinner--large {
+    padding: 2rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .spooky-spinner__animation {
+    filter: none;
+  }
+  
+  .spooky-spinner__message {
+    text-shadow: none;
+    font-weight: 600;
   }
 }

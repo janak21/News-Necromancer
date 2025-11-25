@@ -4,13 +4,15 @@ import type { UserPreferences } from '../../types';
 
 describe('ApiService - Intensity Integration', () => {
   const mockFetch = vi.fn();
+  const originalFetch = globalThis.fetch;
   
   beforeEach(() => {
-    global.fetch = mockFetch;
+    globalThis.fetch = mockFetch as any;
     mockFetch.mockClear();
   });
 
   afterEach(() => {
+    globalThis.fetch = originalFetch;
     vi.restoreAllMocks();
   });
 

@@ -155,6 +155,60 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Audio Player Section */
+.spooky-content-card__audio-section {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(167, 139, 250, 0.2);
+}
+
+.spooky-content-card__audio-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(167, 139, 250, 0.08) 100%);
+  color: var(--color-primary);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  width: 100%;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.spooky-content-card__audio-toggle:hover {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.25) 0%, rgba(167, 139, 250, 0.15) 100%);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.3);
+}
+
+.spooky-content-card__audio-toggle:active {
+  transform: scale(0.98);
+}
+
+.spooky-content-card__audio-toggle svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.spooky-content-card__audio-player-container {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.spooky-content-card__audio-player {
+  width: 100%;
+}
+
 /* Footer */
 .spooky-content-card__footer {
   display: flex;
@@ -162,6 +216,7 @@
   justify-content: space-between;
   padding-top: var(--spacing-md);
   border-top: 1px solid var(--color-surface-elevated);
+  margin-top: var(--spacing-md);
 }
 
 .spooky-content-card__indicators {
@@ -246,6 +301,19 @@
   
   .spooky-content-card__themes {
     justify-content: flex-start;
+  }
+
+  .spooky-content-card__audio-section {
+    margin-top: var(--spacing-md);
+  }
+
+  .spooky-content-card__audio-player-container {
+    padding: var(--spacing-sm);
+  }
+
+  .spooky-content-card__audio-toggle {
+    font-size: var(--font-size-xs);
+    padding: 0.5rem 0.875rem;
   }
 }
 

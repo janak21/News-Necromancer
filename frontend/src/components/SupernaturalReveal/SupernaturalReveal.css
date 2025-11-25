@@ -73,11 +73,20 @@
   margin: 0;
   color: var(--color-text-secondary, #d1d5db);
   font-size: 0.95rem;
-  line-height: 1.7;
   text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+.supernatural-reveal__paragraph {
+  margin: 0 0 1rem 0;
+  line-height: 1.75;
   word-break: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+  white-space: pre-wrap;
+}
+
+.supernatural-reveal__paragraph:last-child {
+  margin-bottom: 0;
 }
 
 .supernatural-reveal__word {

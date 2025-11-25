@@ -57,30 +57,99 @@
 
 .feed-list__search {
   margin-bottom: 0.75rem;
+  position: relative;
 }
 
 .feed-list__search-input {
   width: 100%;
   background: rgba(10, 10, 15, 0.9);
-  border: 1.5px solid rgba(167, 139, 250, 0.25);
+  border: 2px solid rgba(167, 139, 250, 0.3);
   border-radius: var(--radius-lg);
   padding: 0.75rem 1rem;
+  padding-right: 3rem;
   font-size: var(--font-size-base);
   color: var(--color-text);
-  transition: all var(--transition-normal);
+  transition: all 0.3s ease;
   font-family: var(--font-family-sans);
 }
 
+.feed-list__search-spinner {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Focus state with enhanced border and shadow effects */
 .feed-list__search-input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.8);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1),
+              0 0 20px rgba(167, 139, 250, 0.3);
+  background: rgba(167, 139, 250, 0.05);
+}
+
+/* Active state indicator when user is typing */
+.feed-list__search-input:not(:placeholder-shown) {
+  background: rgba(167, 139, 250, 0.08);
+  border-color: rgba(167, 139, 250, 0.5);
+}
+
+/* Combined focus and typing state */
+.feed-list__search-input:focus:not(:placeholder-shown) {
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.9);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15),
+              0 0 25px rgba(167, 139, 250, 0.4),
+              0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover state (when not focused) */
+.feed-list__search-input:hover:not(:focus) {
+  border-color: rgba(167, 139, 250, 0.5);
   background: rgba(10, 10, 15, 1);
 }
 
 .feed-list__search-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
   font-style: italic;
+  transition: color 0.3s ease;
+}
+
+/* Placeholder color change on focus */
+.feed-list__search-input:focus::placeholder {
+  color: rgba(167, 139, 250, 0.5);
+}
+
+/* Searching state - when filtering is in progress */
+.feed-list__search--searching .feed-list__search-input {
+  padding-right: 3rem;
+  border-color: rgba(167, 139, 250, 0.6);
+  background: rgba(167, 139, 250, 0.06);
+}
+
+/* Searching state with focus */
+.feed-list__search--searching .feed-list__search-input:focus {
+  border-color: rgba(167, 139, 250, 0.9);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15),
+              0 0 25px rgba(167, 139, 250, 0.4),
+              0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Subtle pulse animation for searching state */
+@keyframes search-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0);
+  }
+}
+
+.feed-list__search--searching .feed-list__search-input {
+  animation: search-pulse 2s ease-in-out infinite;
 }
 
 /* Filters */
@@ -331,6 +400,18 @@
   .feed-list__clear-filters:hover {
     transform: none;
   }
+  
+  .feed-list__search-input {
+    transition: none;
+  }
+  
+  .feed-list__search-input::placeholder {
+    transition: none;
+  }
+  
+  .feed-list__search--searching .feed-list__search-input {
+    animation: none;
+  }
 }
 
 /* High Contrast Mode */
@@ -508,4 +589,42 @@ eed Management Section */
   text-align: center;
   font-style: italic;
   margin-top: 1rem;
+}
+
+/* Lazy Loading Sentinel */
+.feed-list__sentinel {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  padding: var(--spacing-lg) 0;
+}
+
+.feed-list__loading-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: rgba(22, 22, 29, 0.6);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
+}
+
+/* Ensure smooth scroll behavior */
+.feed-list__grid {
+  scroll-behavior: smooth;
+}
+
+/* Reduced motion for lazy loading */
+@media (prefers-reduced-motion: reduce) {
+  .feed-list__grid {
+    scroll-behavior: auto;
+  }
+  
+  .feed-list__loading-more {
+    transition: none;
+  }
 }

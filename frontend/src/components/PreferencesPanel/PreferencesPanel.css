@@ -433,8 +433,8 @@
     gap: 0.5rem;
   }
 }
-/* 
-Sound Settings Styles */
+
+/* Sound Settings Styles */
 .sound-settings-compact {
   display: flex;
   flex-direction: column;
@@ -549,4 +549,104 @@ Sound Settings Styles */
   font-weight: 600;
   min-width: 45px;
   text-align: right;
+}
+
+/* Voice Narration Settings Styles */
+.voice-settings-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.voice-style-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.voice-setting-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.voice-style-select {
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(138, 43, 226, 0.3);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.voice-style-select:hover {
+  background: rgba(138, 43, 226, 0.1);
+  border-color: rgba(138, 43, 226, 0.5);
+}
+
+.voice-style-select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+}
+
+.voice-style-select option {
+  background: #1a1a2e;
+  color: var(--text-primary);
+  padding: 0.5rem;
+}
+
+.auto-match-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  background: rgba(138, 43, 226, 0.05);
+  border: 1px solid rgba(138, 43, 226, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auto-match-toggle:hover {
+  background: rgba(138, 43, 226, 0.1);
+  border-color: rgba(138, 43, 226, 0.4);
+  transform: translateX(4px);
+}
+
+.auto-match-toggle.enabled {
+  background: rgba(138, 43, 226, 0.15);
+  border-color: rgba(138, 43, 226, 0.5);
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
+}
+
+.auto-match-toggle input {
+  display: none;
+}
+
+.auto-match-toggle > span:first-of-type {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.auto-match-toggle .toggle-icon {
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
+}
+
+.auto-match-toggle:hover .toggle-icon {
+  transform: scale(1.2);
+}
+
+.auto-match-toggle .toggle-description {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  margin-left: 1.6rem;
+  line-height: 1.4;
 }

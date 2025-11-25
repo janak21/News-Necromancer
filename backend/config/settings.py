@@ -27,6 +27,14 @@ class Settings(BaseSettings):
     openrouter_model: str = "gpt-3.5-turbo"
     openrouter_app_name: str = "spooky-rss-system"
     
+    # ElevenLabs/TTS Configuration
+    elevenlabs_api_key: Optional[str] = None
+    narration_cache_dir: str = "./cache/narration"
+    narration_cache_max_size_mb: int = 500
+    narration_cache_ttl_days: int = 7
+    narration_max_concurrent: int = 3
+    narration_max_content_length: int = 10000
+    
     # Fetcher Configuration
     max_concurrent_feeds: int = 10
     feed_timeout: int = 10
@@ -63,8 +71,30 @@ class Settings(BaseSettings):
     
     def validate_required_settings(self):
         """Validate that required settings are present"""
+        errors = []
+        
         if not self.openrouter_api_key:
-            raise ValueError("OPENROUTER_API_KEY is required")
+            errors.append("OPENROUTER_API_KEY is required")
+        
+        if not self.elevenlabs_api_key:
+            errors.append("ELEVENLABS_API_KEY is required")
+        
+        if errors:
+            raise ValueError("; ".join(errors))
+    
+    def validate_production_settings(self):
+        """Validate production-specific settings"""
+        if self.is_production:
+            if self.debug:
+                raise ValueError("DEBUG must be disabled in production environment")
+            
+            # Validate timeout constraints for Vercel free tier
+            narration_timeout = int(os.getenv("NARRATION_TIMEOUT", "9"))
+            if narration_timeout > 10:
+                raise ValueError(
+                    f"NARRATION_TIMEOUT ({narration_timeout}s) exceeds "
+                    "Vercel free tier limit (10s)"
+                )
     
     @property
     def is_development(self) -> bool:
@@ -87,8 +117,9 @@ def get_settings() -> Settings:
     """
     settings = Settings()
     
-    # Validate required settings in production
+    # Validate required settings
     if settings.is_production:
         settings.validate_required_settings()
+        settings.validate_production_settings()
     
     return settings

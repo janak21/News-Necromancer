@@ -48,6 +48,7 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isAmbientPlaying, setIsAmbientPlaying] = useState(false);
+  const [voiceStyles, setVoiceStyles] = useState<Array<{ id: string; name: string; description: string }>>([]);
 
   // Play ambient sound when enabled
   useEffect(() => {
@@ -57,6 +58,31 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
       stopSound('ambient');
     }
   }, [isAmbientPlaying, isEnabled, playSound, stopSound]);
+
+  // Fetch available voice styles
+  useEffect(() => {
+    const fetchVoiceStyles = async () => {
+      try {
+        const styles = await ApiService.getVoiceStyles();
+        setVoiceStyles(styles.map(style => ({
+          id: style.id,
+          name: style.name,
+          description: style.description
+        })));
+      } catch (err) {
+        console.error('Failed to fetch voice styles:', err);
+        // Use fallback voice styles if API fails
+        setVoiceStyles([
+          { id: 'ghostly_whisper', name: 'Ghostly Whisper', description: 'Ethereal and haunting' },
+          { id: 'demonic_growl', name: 'Demonic Growl', description: 'Deep and menacing' },
+          { id: 'eerie_narrator', name: 'Eerie Narrator', description: 'Classic horror storytelling' },
+          { id: 'possessed_child', name: 'Possessed Child', description: 'Innocent yet sinister' },
+          { id: 'ancient_entity', name: 'Ancient Entity', description: 'Timeless and otherworldly' }
+        ]);
+      }
+    };
+    fetchVoiceStyles();
+  }, []);
 
   const handleHorrorTypeToggle = (horrorTypeValue: string) => {
     const updatedTypes = preferences.preferred_horror_types.includes(horrorTypeValue)
@@ -97,6 +123,26 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
     });
   };
 
+  const handleVoiceStyleChange = (voiceStyle: string) => {
+    setPreferences({
+      ...preferences,
+      voice_settings: {
+        ...preferences.voice_settings,
+        preferred_voice_style: voiceStyle
+      }
+    });
+  };
+
+  const handleAutoMatchIntensityToggle = () => {
+    setPreferences({
+      ...preferences,
+      voice_settings: {
+        ...preferences.voice_settings,
+        auto_match_intensity: !preferences.voice_settings?.auto_match_intensity
+      }
+    });
+  };
+
   const handleSavePreferences = async () => {
     setSaving(true);
     setSaveMessage(null);
@@ -115,10 +161,7 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
     }
   };
 
-  const getIntensityLabel = (level: number) => {
-    const labels = ['Whisper', 'Murmur', 'Haunt', 'Terror', 'Nightmare'];
-    return labels[level - 1] || 'Unknown';
-  };
+
 
   if (loading) {
     return (
@@ -279,6 +322,43 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
                 </label>
               </>
             )}
+          </div>
+        </div>
+
+        {/* Voice Narration Settings Section */}
+        <div className="preference-section">
+          <h3>🎙️ Voice Narration</h3>
+          <p className="preference-section-description">
+            Choose your preferred horror voice for AI narration...
+          </p>
+          <div className="voice-settings-compact">
+            <div className="voice-style-selection">
+              <label className="voice-setting-label">Preferred Voice Style</label>
+              <select
+                className="voice-style-select"
+                value={preferences.voice_settings?.preferred_voice_style || 'eerie_narrator'}
+                onChange={(e) => handleVoiceStyleChange(e.target.value)}
+              >
+                {voiceStyles.map((style) => (
+                  <option key={style.id} value={style.id}>
+                    {style.name} - {style.description}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <label className={`auto-match-toggle ${preferences.voice_settings?.auto_match_intensity ? 'enabled' : ''}`}>
+              <input
+                type="checkbox"
+                checked={preferences.voice_settings?.auto_match_intensity ?? true}
+                onChange={handleAutoMatchIntensityToggle}
+              />
+              <span className="toggle-icon">🎭</span>
+              <span>Auto-match voice intensity to content</span>
+              <span className="toggle-description">
+                Automatically adjust voice characteristics based on horror intensity level
+              </span>
+            </label>
           </div>
         </div>
       </div>

@@ -17,6 +17,10 @@ const DEFAULT_PREFERENCES: UserPreferences = {
     accent_color: '#4b0082',
     fog_intensity: 'medium',
   },
+  voice_settings: {
+    preferred_voice_style: 'eerie_narrator',
+    auto_match_intensity: true,
+  },
 };
 
 const useUserPreferences = () => {
@@ -40,6 +44,10 @@ const useUserPreferences = () => {
           theme_customizations: {
             ...DEFAULT_PREFERENCES.theme_customizations,
             ...stored.theme_customizations,
+          },
+          voice_settings: {
+            ...DEFAULT_PREFERENCES.voice_settings,
+            ...stored.voice_settings,
           },
         });
       }
@@ -105,6 +113,16 @@ const useUserPreferences = () => {
     });
   }, [preferences, setPreferences]);
 
+  const updateVoiceSettings = useCallback((settings: { preferred_voice_style?: string; auto_match_intensity?: boolean }) => {
+    setPreferences({
+      ...preferences,
+      voice_settings: {
+        ...preferences.voice_settings,
+        ...settings,
+      },
+    });
+  }, [preferences, setPreferences]);
+
   // Reset to defaults
   const resetPreferences = useCallback(() => {
     setPreferences(DEFAULT_PREFERENCES);
@@ -125,6 +143,7 @@ const useUserPreferences = () => {
     updateContentFilters,
     updateNotificationSettings,
     updateThemeCustomizations,
+    updateVoiceSettings,
     resetPreferences,
     isModified,
   };

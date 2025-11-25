@@ -42,4 +42,38 @@ describe('SupernaturalReveal', () => {
     expect(content).toBeInTheDocument();
     expect(content?.textContent).toContain('dark force');
   });
+
+  it('handles text with missing spaces between words', () => {
+    const malformedText = 'ThegroupsformedonAmazonMusicandSpotifyareexcellent';
+    const { container } = render(
+      <SupernaturalReveal explanation={malformedText} isExpanded={true} />
+    );
+    
+    const content = container.querySelector('.supernatural-reveal__text');
+    expect(content?.textContent).toContain('Amazon Music');
+    expect(content?.textContent).toContain('Spotify');
+  });
+
+  it('formats multiple paragraphs with proper spacing', () => {
+    const multiParagraph = 'First paragraph here.\n\nSecond paragraph here.\n\nThird paragraph here.';
+    const { container } = render(
+      <SupernaturalReveal explanation={multiParagraph} isExpanded={true} />
+    );
+    
+    const paragraphs = container.querySelectorAll('.supernatural-reveal__paragraph');
+    expect(paragraphs.length).toBe(3);
+    expect(paragraphs[0].textContent).toContain('First paragraph');
+    expect(paragraphs[1].textContent).toContain('Second paragraph');
+    expect(paragraphs[2].textContent).toContain('Third paragraph');
+  });
+
+  it('handles single paragraph with word-by-word animation', () => {
+    const singleParagraph = 'This is a single paragraph without breaks';
+    const { container } = render(
+      <SupernaturalReveal explanation={singleParagraph} isExpanded={true} />
+    );
+    
+    const words = container.querySelectorAll('.supernatural-reveal__word');
+    expect(words.length).toBeGreaterThan(0);
+  });
 });

@@ -57,7 +57,7 @@ const IntensitySlider: React.FC<IntensitySliderProps> = ({ value, onChange, disa
   return (
     <div className="intensity-slider">
       <div className="intensity-header">
-        <h3 className="intensity-title">Horror Intensity</h3>
+        <p className="intensity-title" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '1.125rem', margin: 0 }}>Horror Intensity</p>
         <div className="intensity-current">
           <span className="intensity-icon">{currentLevel.icon}</span>
           <span className="intensity-label">{currentLevel.label}</span>

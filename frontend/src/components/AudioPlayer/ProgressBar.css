@@ -1,0 +1,223 @@
+/* ProgressBar Component Styles - Horror Theme */
+/* Requirements: 3.2, 3.5 */
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+/* Time display */
+.progress-bar__time {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #c4b5fd;
+  min-width: 45px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+.progress-bar__time--current {
+  text-align: right;
+}
+
+.progress-bar__time--duration {
+  text-align: left;
+}
+
+/* Progress bar track */
+.progress-bar__track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  background: linear-gradient(90deg, #1a0a2e 0%, #2a0a3d 100%);
+  border: 1px solid #4c1d95;
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: visible;
+  transition: all 0.2s ease;
+}
+
+.progress-bar__track:hover:not(.progress-bar--disabled .progress-bar__track) {
+  height: 10px;
+  border-color: #6d28d9;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Focus state for accessibility */
+.progress-bar__track:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+.progress-bar__track:focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 2px;
+}
+
+/* Progress fill */
+.progress-bar__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+  border-radius: 4px;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+}
+
+/* Animated glow effect */
+.progress-bar__fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Playhead indicator */
+.progress-bar__playhead {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, #ffffff 0%, #c4b5fd 50%, #8b5cf6 100%);
+  border: 2px solid #2a0a3d;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.8), 0 0 5px rgba(255, 255, 255, 0.5);
+  cursor: grab;
+  transition: transform 0.2s ease;
+  z-index: 2;
+}
+
+.progress-bar__track:hover .progress-bar__playhead {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.progress-bar__track:active .progress-bar__playhead {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+/* Hover time tooltip */
+.progress-bar__hover {
+  position: absolute;
+  top: -35px;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.progress-bar__hover-time {
+  background: linear-gradient(135deg, #2a0a3d 0%, #1a0a2e 100%);
+  border: 1px solid #8b5cf6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #e9d5ff;
+  white-space: nowrap;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.progress-bar__hover-time::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #8b5cf6;
+}
+
+/* Disabled state */
+.progress-bar--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.progress-bar--disabled .progress-bar__track {
+  cursor: not-allowed;
+  background: linear-gradient(90deg, #0f0520 0%, #1a0a2e 100%);
+  border-color: #2a0a3d;
+}
+
+.progress-bar--disabled .progress-bar__fill {
+  background: linear-gradient(90deg, #4c1d95 0%, #5b21b6 100%);
+  box-shadow: none;
+}
+
+.progress-bar--disabled .progress-bar__playhead {
+  background: #6d28d9;
+  box-shadow: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .progress-bar__track {
+    border-width: 2px;
+  }
+  
+  .progress-bar__playhead {
+    border-width: 3px;
+  }
+  
+  .progress-bar__time {
+    font-weight: bold;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar__track,
+  .progress-bar__fill,
+  .progress-bar__playhead {
+    transition: none;
+  }
+  
+  .progress-bar__fill::after {
+    animation: none;
+  }
+  
+  .progress-bar__track:hover .progress-bar__playhead {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .progress-bar__track {
+    height: 12px;
+  }
+  
+  .progress-bar__playhead {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .progress-bar__hover {
+    display: none;
+  }
+}

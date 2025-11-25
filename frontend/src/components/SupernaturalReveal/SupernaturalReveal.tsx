@@ -26,27 +26,42 @@ const SupernaturalReveal: React.FC<SupernaturalRevealProps> = ({
     }
   };
 
-  // Split explanation into words for staggered animation
-  // Handle edge case where text has no spaces by inserting spaces
-  let processedExplanation = explanation || '';
+  // Format explanation text with proper spacing and paragraph breaks
+  const formatExplanationText = (text: string): string => {
+    if (!text) return '';
+    
+    let formatted = text;
+    
+    // Check if text has very few spaces (likely a parsing issue)
+    const spaceCount = (formatted.match(/ /g) || []).length;
+    const wordEstimate = formatted.length / 5; // Average word length
+    
+    if (spaceCount < wordEstimate * 0.3 && formatted.length > 50) {
+      // Text has too few spaces - insert spaces before capital letters
+      // This handles cases like "ThegroupsformedonAmazonMusic..."
+      formatted = formatted
+        // Add space before capital letters that follow lowercase letters
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        // Add space before capital letters that follow numbers
+        .replace(/([0-9])([A-Z])/g, '$1 $2')
+        // Add space after periods if missing
+        .replace(/\.([A-Z])/g, '. $1')
+        // Clean up any double spaces
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    
+    return formatted;
+  };
   
-  // Check if text has very few spaces (likely a parsing issue)
-  const spaceCount = (processedExplanation.match(/ /g) || []).length;
-  const wordEstimate = processedExplanation.length / 5; // Average word length
+  const processedExplanation = formatExplanationText(explanation);
   
-  if (spaceCount < wordEstimate * 0.3 && processedExplanation.length > 50) {
-    // Text has too few spaces - insert spaces before capital letters
-    // This handles cases like "ThegroupsformedonAmazonMusic..."
-    processedExplanation = processedExplanation
-      // Add space before capital letters that follow lowercase letters
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      // Add space before capital letters that follow numbers
-      .replace(/([0-9])([A-Z])/g, '$1 $2')
-      // Clean up any double spaces
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
+  // Split into paragraphs for proper formatting
+  const paragraphs = processedExplanation
+    .split(/\n\n+/)
+    .filter(p => p.trim().length > 0);
   
+  // For animation, we'll use the full text split into words
   const words = processedExplanation.split(' ').filter(word => word.length > 0);
 
   return (
@@ -110,22 +125,43 @@ const SupernaturalReveal: React.FC<SupernaturalRevealProps> = ({
               animate={{ y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
             >
-              <p className="supernatural-reveal__text">
-                {words.map((word, index) => (
-                  <motion.span
-                    key={index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: 0.3 + (index * 0.03),
-                      duration: 0.3
-                    }}
-                    className="supernatural-reveal__word"
-                  >
-                    {word}{' '}
-                  </motion.span>
-                ))}
-              </p>
+              <div className="supernatural-reveal__text">
+                {paragraphs.length > 1 ? (
+                  // Multiple paragraphs - render with proper spacing
+                  paragraphs.map((paragraph, pIndex) => (
+                    <motion.p
+                      key={pIndex}
+                      className="supernatural-reveal__paragraph"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        delay: 0.3 + (pIndex * 0.2),
+                        duration: 0.4
+                      }}
+                    >
+                      {paragraph}
+                    </motion.p>
+                  ))
+                ) : (
+                  // Single paragraph - use word-by-word animation
+                  <p className="supernatural-reveal__paragraph">
+                    {words.map((word, index) => (
+                      <motion.span
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          delay: 0.3 + (index * 0.03),
+                          duration: 0.3
+                        }}
+                        className="supernatural-reveal__word"
+                      >
+                        {word}{' '}
+                      </motion.span>
+                    ))}
+                  </p>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}

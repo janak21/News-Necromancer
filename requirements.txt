@@ -14,3 +14,6 @@ aioredis>=2.0.0
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 httpx>=0.24.0
+elevenlabs>=1.0.0
+aiofiles>=23.0.0
+mangum>=0.17.0

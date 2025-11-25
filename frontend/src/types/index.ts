@@ -1,5 +1,8 @@
 // Type definitions for the Spooky RSS System
 
+// Re-export narration types
+export * from './narration';
+
 export interface FeedItem {
   title: string;
   summary: string;
@@ -19,6 +22,8 @@ export interface SpookyVariant {
   generation_timestamp: string;
   variant_id?: string;
   continuation?: StoryContinuation;
+  narration_url?: string;
+  narration_generated_at?: string;
 }
 
 export interface StoryContinuation {
@@ -34,6 +39,10 @@ export interface UserPreferences {
   content_filters: string[];
   notification_settings: Record<string, boolean>;
   theme_customizations: Record<string, string>;
+  voice_settings?: {
+    preferred_voice_style?: string;
+    auto_match_intensity?: boolean;
+  };
 }
 
 export interface ProcessingStats {

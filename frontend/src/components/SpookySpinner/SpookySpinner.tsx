@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import './SpookySpinner.css';
 
@@ -15,6 +15,20 @@ const SpookySpinner: React.FC<SpookySpinnerProps> = ({
   variant = 'ghost',
   className = ''
 }) => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   const sizeMap = {
     small: 40,
     medium: 60,
@@ -24,17 +38,54 @@ const SpookySpinner: React.FC<SpookySpinnerProps> = ({
   const spinnerSize = sizeMap[size];
 
   const renderSpinner = () => {
+    // Reduced motion fallback - simple static or minimal animation
+    if (prefersReducedMotion) {
+      return (
+        <div
+          className={`spooky-spinner__${variant} spooky-spinner--reduced-motion`}
+          style={{ width: spinnerSize, height: spinnerSize }}
+        >
+          {variant === 'ghost' && (
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M50 10 C30 10, 20 25, 20 45 C20 65, 20 80, 20 90 L30 85 L40 90 L50 85 L60 90 L70 85 L80 90 C80 80, 80 65, 80 45 C80 25, 70 10, 50 10 Z"
+                fill="currentColor"
+              />
+              <circle cx="40" cy="45" r="5" fill="#0a0a0f" />
+              <circle cx="60" cy="45" r="5" fill="#0a0a0f" />
+              <path d="M40 60 Q50 65, 60 60" stroke="#0a0a0f" strokeWidth="3" strokeLinecap="round" fill="none" />
+            </svg>
+          )}
+          {variant === 'skull' && (
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="50" cy="45" rx="30" ry="35" fill="currentColor" />
+              <rect x="35" y="50" width="10" height="15" rx="2" fill="#0a0a0f" />
+              <rect x="55" y="50" width="10" height="15" rx="2" fill="#0a0a0f" />
+              <path d="M45 75 L48 80 L50 75 L52 80 L55 75" stroke="#0a0a0f" strokeWidth="2" fill="none" />
+            </svg>
+          )}
+          {variant === 'spiral' && (
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="35" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.8" />
+              <circle cx="50" cy="50" r="25" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.6" />
+              <circle cx="50" cy="50" r="15" stroke="currentColor" strokeWidth="3" fill="none" opacity="0.4" />
+            </svg>
+          )}
+        </div>
+      );
+    }
+
     switch (variant) {
       case 'ghost':
         return (
           <motion.div
             className="spooky-spinner__ghost"
             animate={{
-              y: [0, -10, 0],
-              opacity: [0.6, 1, 0.6]
+              y: [0, -15, 0],
+              opacity: [0.7, 1, 0.7]
             }}
             transition={{
-              duration: 2,
+              duration: 2.5,
               repeat: Infinity,
               ease: 'easeInOut'
             }}
@@ -45,34 +96,50 @@ const SpookySpinner: React.FC<SpookySpinnerProps> = ({
                 d="M50 10 C30 10, 20 25, 20 45 C20 65, 20 80, 20 90 L30 85 L40 90 L50 85 L60 90 L70 85 L80 90 C80 80, 80 65, 80 45 C80 25, 70 10, 50 10 Z"
                 fill="currentColor"
                 animate={{
-                  scale: [1, 1.05, 1]
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                }}
-              />
-              <circle cx="40" cy="45" r="5" fill="#1f2937" />
-              <circle cx="60" cy="45" r="5" fill="#1f2937" />
-              <motion.path
-                d="M40 60 Q50 65, 60 60"
-                stroke="#1f2937"
-                strokeWidth="3"
-                strokeLinecap="round"
-                fill="none"
-                animate={{
-                  d: [
-                    'M40 60 Q50 65, 60 60',
-                    'M40 60 Q50 55, 60 60',
-                    'M40 60 Q50 65, 60 60'
-                  ]
+                  scale: [1, 1.08, 1]
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
                   ease: 'easeInOut'
                 }}
+              />
+              <motion.circle
+                cx="40"
+                cy="45"
+                r="5"
+                fill="#0a0a0f"
+                animate={{
+                  scale: [1, 1.2, 1]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 0.2
+                }}
+              />
+              <motion.circle
+                cx="60"
+                cy="45"
+                r="5"
+                fill="#0a0a0f"
+                animate={{
+                  scale: [1, 1.2, 1]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 0.2
+                }}
+              />
+              <path
+                d="M40 60 Q50 65, 60 60"
+                stroke="#0a0a0f"
+                strokeWidth="3"
+                strokeLinecap="round"
+                fill="none"
               />
             </svg>
           </motion.div>
@@ -83,20 +150,87 @@ const SpookySpinner: React.FC<SpookySpinnerProps> = ({
           <motion.div
             className="spooky-spinner__skull"
             animate={{
-              rotate: [0, 360]
+              rotate: [0, 360],
+              scale: [1, 1.1, 1]
             }}
             transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'linear'
+              rotate: {
+                duration: 3,
+                repeat: Infinity,
+                ease: 'linear'
+              },
+              scale: {
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }
             }}
             style={{ width: spinnerSize, height: spinnerSize }}
           >
             <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="50" cy="45" rx="30" ry="35" fill="currentColor" />
-              <rect x="35" y="50" width="10" height="15" rx="2" fill="#1f2937" />
-              <rect x="55" y="50" width="10" height="15" rx="2" fill="#1f2937" />
-              <path d="M45 75 L48 80 L50 75 L52 80 L55 75" stroke="#1f2937" strokeWidth="2" fill="none" />
+              <motion.ellipse
+                cx="50"
+                cy="45"
+                rx="30"
+                ry="35"
+                fill="currentColor"
+                animate={{
+                  opacity: [0.9, 1, 0.9]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+              />
+              <motion.rect
+                x="35"
+                y="50"
+                width="10"
+                height="15"
+                rx="2"
+                fill="#0a0a0f"
+                animate={{
+                  height: [15, 18, 15]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 0.3
+                }}
+              />
+              <motion.rect
+                x="55"
+                y="50"
+                width="10"
+                height="15"
+                rx="2"
+                fill="#0a0a0f"
+                animate={{
+                  height: [15, 18, 15]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 0.3
+                }}
+              />
+              <motion.path
+                d="M45 75 L48 80 L50 75 L52 80 L55 75"
+                stroke="#0a0a0f"
+                strokeWidth="2"
+                fill="none"
+                animate={{
+                  strokeWidth: [2, 3, 2]
+                }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+              />
             </svg>
           </motion.div>
         );
@@ -113,13 +247,27 @@ const SpookySpinner: React.FC<SpookySpinnerProps> = ({
                 className="spooky-spinner__spiral-ring"
                 animate={{
                   rotate: [0, 360],
-                  scale: [1, 1.2, 1]
+                  scale: [1, 1.15, 1],
+                  opacity: [0.4 + i * 0.2, 0.8 + i * 0.1, 0.4 + i * 0.2]
                 }}
                 transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'linear',
-                  delay: i * 0.2
+                  rotate: {
+                    duration: 2.5 - i * 0.3,
+                    repeat: Infinity,
+                    ease: 'linear'
+                  },
+                  scale: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: i * 0.15
+                  },
+                  opacity: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: i * 0.15
+                  }
                 }}
                 style={{
                   width: spinnerSize - i * 15,
@@ -136,7 +284,12 @@ const SpookySpinner: React.FC<SpookySpinnerProps> = ({
   };
 
   return (
-    <div className={`spooky-spinner spooky-spinner--${size} ${className}`}>
+    <div 
+      className={`spooky-spinner spooky-spinner--${size} spooky-spinner--${variant} ${className}`}
+      role="status"
+      aria-live="polite"
+      aria-label={message || 'Loading'}
+    >
       <div className="spooky-spinner__animation">
         {renderSpinner()}
       </div>
@@ -145,10 +298,10 @@ const SpookySpinner: React.FC<SpookySpinnerProps> = ({
         <motion.p
           className="spooky-spinner__message"
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
+          animate={prefersReducedMotion ? { opacity: 1 } : { opacity: [0.6, 1, 0.6] }}
           transition={{
-            duration: 2,
-            repeat: Infinity,
+            duration: prefersReducedMotion ? 0 : 2.5,
+            repeat: prefersReducedMotion ? 0 : Infinity,
             ease: 'easeInOut'
           }}
         >

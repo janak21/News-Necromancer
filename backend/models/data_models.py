@@ -71,7 +71,21 @@ class StoryContinuation:
 
 @dataclass
 class SpookyVariant:
-    """Horror-themed transformation of original RSS content"""
+    """Horror-themed transformation of original RSS content
+    
+    Attributes:
+        original_item: The original RSS feed item
+        haunted_title: Horror-themed transformation of the title
+        haunted_summary: Horror-themed transformation of the summary
+        horror_themes: List of horror themes applied to this variant
+        supernatural_explanation: Supernatural narrative explanation
+        personalization_applied: Whether user preferences were applied
+        generation_timestamp: When this variant was generated
+        variant_id: Unique identifier for this variant
+        continuation: Optional story continuation for extended narrative
+        narration_url: Optional URL to generated AI voice narration audio file
+        narration_generated_at: Optional timestamp when narration was generated
+    """
     original_item: FeedItem
     haunted_title: str
     haunted_summary: str
@@ -81,6 +95,8 @@ class SpookyVariant:
     generation_timestamp: datetime = field(default_factory=datetime.now)
     variant_id: Optional[str] = None
     continuation: Optional['StoryContinuation'] = None
+    narration_url: Optional[str] = None
+    narration_generated_at: Optional[datetime] = None
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization"""
@@ -93,7 +109,9 @@ class SpookyVariant:
             "personalization_applied": self.personalization_applied,
             "generation_timestamp": self.generation_timestamp.isoformat(),
             "variant_id": self.variant_id,
-            "continuation": self.continuation.to_dict() if self.continuation else None
+            "continuation": self.continuation.to_dict() if self.continuation else None,
+            "narration_url": self.narration_url,
+            "narration_generated_at": self.narration_generated_at.isoformat() if self.narration_generated_at else None
         }
 
 

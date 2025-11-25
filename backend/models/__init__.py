@@ -12,6 +12,15 @@ from .data_models import (
     StatusResponse
 )
 
+from .narration_models import (
+    VoiceStyleEnum,
+    GenerationStatus,
+    NarrationGenerateRequest,
+    NarrationGenerateResponse,
+    NarrationStatusResponse,
+    VoiceStyleInfo
+)
+
 __all__ = [
     "FeedItem",
     "SpookyVariant", 
@@ -19,5 +28,11 @@ __all__ = [
     "ProcessingStats",
     "HealthStatus",
     "ProcessingResponse",
-    "StatusResponse"
+    "StatusResponse",
+    "VoiceStyleEnum",
+    "GenerationStatus",
+    "NarrationGenerateRequest",
+    "NarrationGenerateResponse",
+    "NarrationStatusResponse",
+    "VoiceStyleInfo"
 ]

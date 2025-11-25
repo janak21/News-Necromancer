@@ -95,7 +95,7 @@ const HomePage: React.FC = () => {
         <Grid cols={3} gap="md" responsive style={{ width: '100%' }}>
           <Card variant="elevated" hover glow className="feature-card feature-card--compact">
             <div className="spooky-card__header">
-              <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>👻 Horror Transformation</h3>
+              <h2 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>👻 Horror Transformation</h2>
             </div>
             <div className="spooky-card__body">
               <p style={{ fontSize: '0.875rem', lineHeight: 1.4 }}>Convert ordinary RSS content into terrifying tales using advanced AI.</p>
@@ -104,7 +104,7 @@ const HomePage: React.FC = () => {
 
           <Card variant="elevated" hover glow className="feature-card feature-card--compact">
             <div className="spooky-card__header">
-              <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>⚡ Lightning Fast</h3>
+              <h2 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>⚡ Lightning Fast</h2>
             </div>
             <div className="spooky-card__body">
               <p style={{ fontSize: '0.875rem', lineHeight: 1.4 }}>Process 100+ RSS feeds per minute with concurrent fetching.</p>
@@ -113,7 +113,7 @@ const HomePage: React.FC = () => {
 
           <Card variant="elevated" hover glow className="feature-card feature-card--compact">
             <div className="spooky-card__header">
-              <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>🎨 Personalized</h3>
+              <h2 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>🎨 Personalized</h2>
             </div>
             <div className="spooky-card__body">
               <p style={{ fontSize: '0.875rem', lineHeight: 1.4 }}>Customize horror intensity and themes to match your preferences.</p>
@@ -146,7 +146,7 @@ const HomePage: React.FC = () => {
         {/* Ghost Notification Demo - Compact */}
         <Card variant="outlined" padding="sm" style={{ width: '100%', maxWidth: '600px' }}>
           <div className="spooky-card__header">
-            <h3 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>👻 Test Ghost Notifications</h3>
+            <h2 className="spooky-card__title" style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>👻 Test Ghost Notifications</h2>
             <p style={{ color: colors.textSecondary, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
               Try out the spooky notification system
             </p>
@@ -155,28 +155,28 @@ const HomePage: React.FC = () => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => showSuccess("🎉 Spooky transformation complete!")}
+              onClick={() => { showSuccess("🎉 Spooky transformation complete!"); }}
             >
               Success
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => showError("💀 Something went terribly wrong...")}
+              onClick={() => { showError("💀 Something went terribly wrong..."); }}
             >
               Error
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => showWarning("⚠️ The spirits are restless tonight...")}
+              onClick={() => { showWarning("⚠️ The spirits are restless tonight..."); }}
             >
               Warning
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => showInfo("🔮 New spooky content available!")}
+              onClick={() => { showInfo("🔮 New spooky content available!"); }}
             >
               Info
             </Button>
@@ -192,9 +192,9 @@ const HomePage: React.FC = () => {
           <div className="spooky-card__body">
             <Grid cols={2} gap="md" responsive>
               <div>
-                <h4 style={{ color: colors.textSecondary, marginBottom: 'var(--spacing-sm)' }}>
+                <h3 style={{ color: colors.textSecondary, marginBottom: 'var(--spacing-sm)' }}>
                   📰 Original RSS Content:
-                </h4>
+                </h3>
                 <Card variant="ghost" padding="sm" style={{ marginBottom: 'var(--spacing-md)' }}>
                   <p style={{ fontStyle: 'italic', color: colors.textSecondary, fontSize: 'var(--font-size-sm)' }}>
                     "Local bakery opens new location downtown, featuring artisanal breads and pastries made with traditional recipes..."
@@ -212,9 +212,9 @@ const HomePage: React.FC = () => {
                 </Card>
               </div>
               <div>
-                <h4 style={{ color: colors.primary, marginBottom: 'var(--spacing-sm)' }}>
+                <h3 style={{ color: colors.primary, marginBottom: 'var(--spacing-sm)' }}>
                   👻 Spooky Transformation:
-                </h4>
+                </h3>
                 <Card variant="ghost" padding="sm" style={{ marginBottom: 'var(--spacing-md)' }}>
                   <p style={{ fontStyle: 'italic', color: colors.text, fontSize: 'var(--font-size-sm)' }}>
                     "Ancient bakery emerges from shadows downtown, where bread rises with whispered incantations and pastries hold secrets of the damned. The 'traditional recipes' are carved in bone..."

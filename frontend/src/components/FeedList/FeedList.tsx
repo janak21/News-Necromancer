@@ -1,6 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpookyCard from '../SpookyCard/SpookyCard';
+import SpookySpinner from '../SpookySpinner/SpookySpinner';
+import FilterResults from '../FilterResults/FilterResults';
+import useLazyLoad from '../../hooks/useLazyLoad';
 import type { SpookyVariant, SpookyFeed, StoryContinuation } from '../../types';
 import './FeedList.css';
 
@@ -30,6 +33,19 @@ const FeedList: React.FC<FeedListProps> = ({
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Debounce search query
+  useEffect(() => {
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setIsSearching(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Extract all unique themes from variants
   const allThemes = useMemo(() => {
@@ -62,9 +78,9 @@ const FeedList: React.FC<FeedListProps> = ({
   const filteredAndSortedVariants = useMemo(() => {
     let filtered = allVariants;
 
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+    // Apply search filter (using debounced query)
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.toLowerCase();
       filtered = filtered.filter(variant =>
         variant.haunted_title.toLowerCase().includes(query) ||
         variant.haunted_summary.toLowerCase().includes(query) ||
@@ -123,7 +139,27 @@ const FeedList: React.FC<FeedListProps> = ({
     }
 
     return filtered;
-  }, [allVariants, sortBy, filterBy, selectedThemes, searchQuery]);
+  }, [allVariants, sortBy, filterBy, selectedThemes, debouncedSearchQuery]);
+
+  // Determine if filters are active
+  const isFiltered = useMemo(() => {
+    return debouncedSearchQuery.trim() !== '' || 
+           filterBy !== 'all' || 
+           selectedThemes.length > 0;
+  }, [debouncedSearchQuery, filterBy, selectedThemes]);
+
+  // Lazy load variants for better performance
+  const { 
+    displayedItems, 
+    isLoadingMore, 
+    hasMore, 
+    sentinelRef 
+  } = useLazyLoad({
+    items: filteredAndSortedVariants,
+    initialCount: 20,
+    loadMoreCount: 10,
+    threshold: 200
+  });
 
   const handleThemeToggle = (theme: string) => {
     setSelectedThemes(prev => 
@@ -170,14 +206,14 @@ const FeedList: React.FC<FeedListProps> = ({
           >
             👻
           </motion.span>
-          <motion.h3 
+          <motion.h2 
             className="feed-list__empty-title"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.4 }}
           >
             No Spooky Content Yet
-          </motion.h3>
+          </motion.h2>
           <motion.p 
             className="feed-list__empty-description"
             initial={{ opacity: 0, y: 10 }}
@@ -213,14 +249,20 @@ const FeedList: React.FC<FeedListProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <div className="feed-list__search">
+          <div className={`feed-list__search ${isSearching ? 'feed-list__search--searching' : ''}`}>
             <input
               type="text"
               placeholder="Search spooky content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="feed-list__search-input"
+              aria-label="Search through spooky content"
             />
+            {isSearching && (
+              <div className="feed-list__search-spinner">
+                <SpookySpinner variant="spiral" size="small" />
+              </div>
+            )}
           </div>
 
           <div className="feed-list__filters">
@@ -281,6 +323,13 @@ const FeedList: React.FC<FeedListProps> = ({
               </div>
             </div>
           )}
+
+          {/* Filter Results Count */}
+          <FilterResults
+            totalCount={allVariants.length}
+            filteredCount={filteredAndSortedVariants.length}
+            isFiltered={isFiltered}
+          />
         </motion.div>
       )}
 
@@ -293,7 +342,7 @@ const FeedList: React.FC<FeedListProps> = ({
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <div className="feed-list__feeds-header">
-            <h3 className="feed-list__feeds-title">📡 Your Feeds ({feeds.length})</h3>
+            <h2 className="feed-list__feeds-title">📡 Your Feeds ({feeds.length})</h2>
             {feeds.length > 1 && (
               <button
                 onClick={() => {
@@ -362,30 +411,13 @@ const FeedList: React.FC<FeedListProps> = ({
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         <motion.div 
-          className="feed-list__results-header"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-        >
-          <motion.span 
-            className="feed-list__results-count"
-            key={filteredAndSortedVariants.length}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            {filteredAndSortedVariants.length} spooky variant{filteredAndSortedVariants.length !== 1 ? 's' : ''}
-          </motion.span>
-        </motion.div>
-
-        <motion.div 
           className="feed-list__grid"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
         >
           <AnimatePresence mode="popLayout">
-            {filteredAndSortedVariants.map((variant, index) => (
+            {displayedItems.map((variant, index) => (
               <motion.div
                 key={`${variant.original_item.link}-${index}`}
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -404,6 +436,27 @@ const FeedList: React.FC<FeedListProps> = ({
               </motion.div>
             ))}
           </AnimatePresence>
+
+          {/* Lazy loading sentinel */}
+          {hasMore && (
+            <div ref={sentinelRef} className="feed-list__sentinel">
+              {isLoadingMore && (
+                <motion.div
+                  className="feed-list__loading-more"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <SpookySpinner 
+                    variant="ghost" 
+                    size="medium"
+                    message="Loading more nightmares..."
+                  />
+                </motion.div>
+              )}
+            </div>
+          )}
         </motion.div>
 
         <AnimatePresence>
@@ -429,14 +482,14 @@ const FeedList: React.FC<FeedListProps> = ({
               >
                 🔍
               </motion.span>
-              <motion.h3 
+              <motion.h2 
                 className="feed-list__no-results-title"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.4 }}
               >
                 No Matching Content
-              </motion.h3>
+              </motion.h2>
               <motion.p 
                 className="feed-list__no-results-description"
                 initial={{ opacity: 0, y: 10 }}
