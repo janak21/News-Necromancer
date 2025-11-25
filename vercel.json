@@ -9,14 +9,34 @@
       }
     },
     {
-      "src": "api/**/*.py",
+      "src": "api/health.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/feeds/process.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/narration/generate.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/health",
+      "dest": "/api/health.py"
+    },
+    {
+      "src": "/api/feeds/process",
+      "dest": "/api/feeds/process.py"
+    },
+    {
+      "src": "/api/narration/generate",
+      "dest": "/api/narration/generate.py"
+    },
+    {
+      "src": "/api/narration/status/(.*)",
+      "dest": "/api/narration/generate.py"
     },
     {
       "handle": "filesystem"
