@@ -10,15 +10,24 @@
     },
     {
       "src": "api/health.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": ["backend/**"]
+      }
     },
     {
       "src": "api/feeds/process.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": ["backend/**"]
+      }
     },
     {
       "src": "api/narration/generate.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": ["backend/**"]
+      }
     }
   ],
   "routes": [
