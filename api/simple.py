@@ -1,15 +1,20 @@
 """
-Ultra-simple test endpoint without FastAPI.
+Ultra-simple test endpoint using Vercel's Python runtime format.
 """
 
-def handler(event, context):
-    """
-    Direct Lambda handler without Mangum/FastAPI.
-    """
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-        'body': '{"status": "success", "message": "Direct handler working!"}'
-    }
+from http.server import BaseHTTPRequestHandler
+
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(b'{"status": "success", "message": "Vercel Python function working!"}')
+        return
+    
+    def do_POST(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(b'{"status": "success", "message": "POST working!"}')
+        return
