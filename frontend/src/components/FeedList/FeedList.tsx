@@ -51,13 +51,9 @@ const FeedList: React.FC<FeedListProps> = ({
   const allThemes = useMemo(() => {
     const themes = new Set<string>();
     feeds.forEach(feed => {
-      if (feed.variants && Array.isArray(feed.variants)) {
-        feed.variants.forEach(variant => {
-          if (variant.horror_themes && Array.isArray(variant.horror_themes)) {
-            variant.horror_themes.forEach(theme => themes.add(theme));
-          }
-        });
-      }
+      feed.variants.forEach(variant => {
+        variant.horror_themes.forEach(theme => themes.add(theme));
+      });
     });
     return Array.from(themes).sort();
   }, [feeds]);
@@ -66,17 +62,14 @@ const FeedList: React.FC<FeedListProps> = ({
   const allVariants = useMemo(() => {
     const variants: (SpookyVariant & { feedId: string; feedTitle: string })[] = [];
     feeds.forEach(feed => {
-      if (feed.variants && Array.isArray(feed.variants)) {
-        const feedVariants = feed.variants.slice(0, maxItemsPerFeed);
-        feedVariants.forEach(variant => {
-          variants.push({
-            ...variant,
-            horror_themes: variant.horror_themes || [],
-            feedId: feed.id,
-            feedTitle: feed.title
-          });
+      const feedVariants = feed.variants.slice(0, maxItemsPerFeed);
+      feedVariants.forEach(variant => {
+        variants.push({
+          ...variant,
+          feedId: feed.id,
+          feedTitle: feed.title
         });
-      }
+      });
     });
     return variants;
   }, [feeds, maxItemsPerFeed]);
