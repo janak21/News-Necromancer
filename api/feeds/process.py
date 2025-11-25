@@ -47,7 +47,7 @@ class FeedProcessingResponse(BaseModel):
     variants: List[dict]
 
 
-@app.post("/api/feeds/process", response_model=FeedProcessingResponse)
+@app.post("/", response_model=FeedProcessingResponse)
 async def process_feeds(request: FeedProcessingRequest):
     """
     Process RSS feeds and generate spooky variants.

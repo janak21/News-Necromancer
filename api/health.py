@@ -12,7 +12,7 @@ from datetime import datetime
 app = FastAPI()
 
 
-@app.get("/api/health")
+@app.get("/")
 async def health_check():
     """
     Simple health check endpoint for serverless environment.
@@ -29,7 +29,7 @@ async def health_check():
     }
 
 
-@app.get("/api/health/simple")
+@app.get("/simple")
 async def simple_health():
     """Ultra-simple health check for load balancers"""
     return {"status": "ok"}

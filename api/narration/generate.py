@@ -68,7 +68,7 @@ class NarrationStatusResponse(BaseModel):
     completed_at: Optional[datetime] = None
 
 
-@app.post("/api/narration/generate", response_model=NarrationGenerateResponse)
+@app.post("/", response_model=NarrationGenerateResponse)
 async def generate_narration(request: NarrationGenerateRequest):
     """
     Generate voice narration for content.
@@ -156,7 +156,7 @@ async def generate_narration(request: NarrationGenerateRequest):
         )
 
 
-@app.get("/api/narration/status/{request_id}", response_model=NarrationStatusResponse)
+@app.get("/status/{request_id}", response_model=NarrationStatusResponse)
 async def get_narration_status(request_id: str):
     """
     Get generation status for a narration request.
