@@ -76,12 +76,15 @@ async def generate_narration_async(request_data: dict) -> dict:
     logger.info(f"Calling ElevenLabs API: {url}")
     
     # Adjust voice settings based on intensity
+    # Note: Free tier has limitations on voice settings
     stability = 0.3 + (intensity_level * 0.1)  # 0.4 to 0.8
     similarity_boost = 0.5 + (intensity_level * 0.05)  # 0.55 to 0.75
     
+    # Use the free tier model (eleven_turbo_v2 or eleven_turbo_v2_5)
+    # Free tier models: eleven_turbo_v2, eleven_turbo_v2_5
     payload = {
         "text": content,
-        "model_id": "eleven_monolingual_v1",
+        "model_id": "eleven_turbo_v2_5",  # Free tier compatible model
         "voice_settings": {
             "stability": min(stability, 1.0),
             "similarity_boost": min(similarity_boost, 1.0)
