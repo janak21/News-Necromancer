@@ -114,7 +114,8 @@ async def generate_narration_async(request_data: dict) -> dict:
                     
                     logger.info(f"✅ Generated narration: {len(audio_data)} bytes, ~{duration:.1f}s")
                     
-                    # Return in the format expected by frontend
+                    # Return completed status with audio immediately
+                    # Frontend will see status="completed" and use the audio_url
                     return {
                         "request_id": variant_id,
                         "status": "completed",

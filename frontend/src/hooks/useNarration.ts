@@ -278,6 +278,21 @@ export const useNarration = ({
         requestId: response.request_id
       }));
 
+      // Check if audio is already available (serverless immediate generation)
+      if (response.status === 'completed' && (response as any).audio_url) {
+        console.log('✅ Audio already generated, skipping polling');
+        const audioUrl = (response as any).audio_url;
+        cacheNarration(audioUrl);
+        setState({
+          status: 'ready',
+          progress: 100,
+          audioUrl: audioUrl,
+          error: null,
+          requestId: response.request_id
+        });
+        return;
+      }
+
       // Start polling for status
       console.log('🔄 Starting status polling for:', response.request_id);
       await pollGenerationStatus(response.request_id);
