@@ -55,6 +55,19 @@ const HomePage: React.FC = () => {
       <Flex direction="column" align="center" gap="lg">
         {/* Hero Section - Compact */}
         <div className="homepage-hero" style={{ textAlign: 'center', marginBottom: '1rem', paddingTop: '1rem' }}>
+          <div style={{ marginBottom: 'var(--spacing-md)' }}>
+            <img 
+              src="/logo.png" 
+              alt="News Necromancer Logo" 
+              style={{
+                height: '120px',
+                width: 'auto',
+                display: 'block',
+                margin: '0 auto',
+                filter: 'drop-shadow(0 0 15px rgba(138, 43, 226, 0.6))'
+              }}
+            />
+          </div>
           <h1 style={{ 
             fontSize: 'clamp(2rem, 5vw, 3rem)', 
             fontWeight: 'var(--font-weight-bold)',
@@ -65,7 +78,7 @@ const HomePage: React.FC = () => {
             backgroundClip: 'text',
             lineHeight: 1.2
           }}>
-            🎃 Spooky RSS System
+            News Necromancer
           </h1>
           <p style={{ 
             fontSize: 'clamp(1rem, 2vw, 1.125rem)', 
