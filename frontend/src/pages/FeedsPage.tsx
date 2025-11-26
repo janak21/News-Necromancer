@@ -122,7 +122,18 @@ const FeedsPage: React.FC = () => {
   const handleContinueStory = async (variantId: string): Promise<StoryContinuation> => {
     try {
       showInfo('🌙 Summoning darker forces to continue the nightmare...');
-      const continuation = await ApiService.continueStory(variantId);
+      
+      // Find the variant to get its content
+      let variantContent = '';
+      for (const feed of feeds) {
+        const variant = feed.variants.find(v => v.variant_id === variantId);
+        if (variant) {
+          variantContent = variant.haunted_summary || variant.original_item.summary;
+          break;
+        }
+      }
+      
+      const continuation = await ApiService.continueStory(variantId, 500, variantContent);
       showSuccess('✨ The nightmare continues...');
       return continuation;
     } catch (error) {

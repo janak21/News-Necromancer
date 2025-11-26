@@ -142,9 +142,10 @@ export class ApiService {
 
   static async continueStory(
     variantId: string,
-    continuationLength: number = 500
+    continuationLength: number = 500,
+    originalContent?: string
   ): Promise<StoryContinuation> {
-    const url = `${API_BASE_URL}/feeds/variants/${variantId}/continue?continuation_length=${continuationLength}`;
+    const url = `${API_BASE_URL}/story_continue`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
@@ -154,6 +155,11 @@ export class ApiService {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          variant_id: variantId,
+          content: originalContent || 'A mysterious horror story that needs continuation...',
+          continuation_length: continuationLength
+        }),
         signal: controller.signal,
       });
 
