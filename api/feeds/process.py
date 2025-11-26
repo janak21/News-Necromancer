@@ -22,6 +22,17 @@ logger = logging.getLogger(__name__)
 # Create FastAPI app for feed processing
 app = FastAPI()
 
+# Add CORS middleware
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 class UserPreferences(BaseModel):
     preferred_horror_types: Optional[List[str]] = None
@@ -169,7 +180,17 @@ Return as JSON with keys: "title", "content", "themes", "explanation"
         raise
 
 
-@app.post("/api/feeds/process")
+@app.get("/")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "ok",
+        "service": "feed-processing",
+        "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY"))
+    }
+
+
+@app.post("/")
 async def process_feeds(request: FeedProcessRequest):
     """
     Process RSS feeds and generate spooky horror variants.
