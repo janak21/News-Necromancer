@@ -3,66 +3,19 @@ Feed processing serverless function for Vercel deployment.
 Transforms RSS feeds into spooky horror stories using OpenRouter AI.
 """
 
-from mangum import Mangum
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import Optional, List
-import logging
+from http.server import BaseHTTPRequestHandler
+import json
 import os
 import uuid
 import asyncio
 import feedparser
 from datetime import datetime
 import aiohttp
+import logging
 
-# Configure logging for serverless
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Create FastAPI app for feed processing
-app = FastAPI()
-
-# Add CORS middleware
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your domain
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-class UserPreferences(BaseModel):
-    preferred_horror_types: Optional[List[str]] = None
-    intensity_level: Optional[int] = 3
-    content_filters: Optional[List[str]] = None
-
-
-class FeedProcessRequest(BaseModel):
-    urls: List[str]
-    variant_count: int = 2
-    intensity: Optional[int] = 3
-    user_preferences: Optional[UserPreferences] = None
-
-
-class OriginalItem(BaseModel):
-    title: str
-    summary: str
-    link: str
-    published: str
-
-
-class SpookyVariant(BaseModel):
-    variant_id: str
-    original_item: OriginalItem
-    haunted_title: str
-    haunted_summary: str
-    horror_themes: List[str]
-    supernatural_explanation: str
-    personalization_applied: bool
-    generation_timestamp: str
 
 
 async def fetch_rss_feed(url: str, timeout: int = 4) -> dict:
@@ -75,7 +28,7 @@ async def fetch_rss_feed(url: str, timeout: int = 4) -> dict:
                     feed = feedparser.parse(content)
                     
                     articles = []
-                    for entry in feed.entries[:3]:  # Reduced from 5 to 3 for speed
+                    for entry in feed.entries[:3]:  # Limit to 3 articles
                         articles.append({
                             "title": entry.get("title", "Unknown"),
                             "summary": entry.get("summary", entry.get("description", "")),
@@ -104,11 +57,10 @@ async def fetch_rss_feed(url: str, timeout: int = 4) -> dict:
         }
 
 
-async def call_openrouter_api(title: str, content: str, intensity: int, themes: Optional[List[str]]) -> dict:
+async def call_openrouter_api(title: str, content: str, intensity: int, themes: list = None) -> dict:
     """Call OpenRouter API to transform content into horror story"""
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        # Log this explicitly
         logger.error("OPENROUTER_API_KEY environment variable is missing")
         raise ValueError("Server configuration error: OPENROUTER_API_KEY not set")
     
@@ -133,11 +85,11 @@ Return as JSON with keys: "title", "content", "themes", "explanation"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://ghostrevive.vercel.app"
+        "HTTP-Referer": "https://news-necromancer.vercel.app"
     }
     
     payload = {
-        "model": "gpt-3.5-turbo",
+        "model": "openai/gpt-3.5-turbo",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.7,
         "max_tokens": 300
@@ -149,14 +101,13 @@ Return as JSON with keys: "title", "content", "themes", "explanation"
                 "https://openrouter.ai/api/v1/chat/completions",
                 json=payload,
                 headers=headers,
-                timeout=aiohttp.ClientTimeout(total=8) # Reduced timeout
+                timeout=aiohttp.ClientTimeout(total=8)
             ) as resp:
                 if resp.status == 200:
                     data = await resp.json()
                     response_text = data["choices"][0]["message"]["content"]
                     
                     # Parse JSON response
-                    import json
                     try:
                         horror_data = json.loads(response_text)
                     except json.JSONDecodeError:
@@ -180,128 +131,170 @@ Return as JSON with keys: "title", "content", "themes", "explanation"
         raise
 
 
-@app.get("/")
-async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "ok",
-        "service": "feed-processing",
-        "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY"))
-    }
-
-
-@app.post("/")
-async def process_feeds(request: FeedProcessRequest):
-    """
-    Process RSS feeds and generate spooky horror variants.
-    """
-    try:
-        if not request.urls:
-            raise HTTPException(status_code=400, detail="At least one RSS URL is required")
+async def process_feeds_async(request_data: dict) -> dict:
+    """Process RSS feeds and generate spooky horror variants"""
+    urls = request_data.get("urls", [])
+    variant_count = request_data.get("variant_count", 1)
+    intensity = request_data.get("intensity", 3)
+    user_preferences = request_data.get("user_preferences", {})
+    
+    if not urls:
+        raise ValueError("At least one RSS URL is required")
+    
+    logger.info(f"Processing {len(urls)} feeds with {variant_count} variants each")
+    
+    # Fetch all feeds concurrently
+    feed_tasks = [fetch_rss_feed(url) for url in urls]
+    feed_results = await asyncio.gather(*feed_tasks, return_exceptions=True)
+    
+    # Process results and generate variants
+    processing_id = str(uuid.uuid4())
+    variants = []
+    
+    # Prepare AI tasks
+    ai_tasks = []
+    
+    for feed_result in feed_results:
+        if isinstance(feed_result, Exception):
+            logger.error(f"Feed fetch failed: {feed_result}")
+            continue
         
-        logger.info(f"Processing {len(request.urls)} feeds with {request.variant_count} variants each")
+        if not feed_result.get("success"):
+            logger.warning(f"Failed to fetch {feed_result.get('url')}: {feed_result.get('error')}")
+            continue
         
-        # Fetch all feeds concurrently
-        feed_tasks = [fetch_rss_feed(url) for url in request.urls]
-        feed_results = await asyncio.gather(*feed_tasks, return_exceptions=True)
+        articles = feed_result.get("articles", [])
         
-        # Process results and generate variants
-        processing_id = str(uuid.uuid4())
-        variants = []
+        # Limit total processing to avoid timeouts
+        limit = 2 if len(urls) > 1 else 3
         
-        # Prepare AI tasks
-        ai_tasks = []
-        
-        for feed_result in feed_results:
-            if isinstance(feed_result, Exception):
-                logger.error(f"Feed fetch failed: {feed_result}")
-                continue
-            
-            if not feed_result.get("success"):
-                logger.warning(f"Failed to fetch {feed_result.get('url')}: {feed_result.get('error')}")
-                continue
-            
-            articles = feed_result.get("articles", [])
-            
-            # Limit total processing to avoid timeouts
-            # Only process first 2 articles per feed if multiple feeds
-            limit = 2 if len(request.urls) > 1 else 3
-            
-            for article in articles[:limit]:
-                # Generate horror variants for each article
-                for _ in range(request.variant_count):
-                    ai_tasks.append({
-                        "article": article,
-                        "task": call_openrouter_api(
-                            title=article.get("title", "Unknown"),
-                            content=article.get("summary", ""),
-                            intensity=request.intensity or 3,
-                            themes=request.user_preferences.preferred_horror_types if request.user_preferences else None
-                        )
-                    })
-
-        # Execute AI tasks concurrently
-        if not ai_tasks:
-             raise HTTPException(status_code=422, detail="No articles found in provided feeds")
-             
-        ai_results = await asyncio.gather(*[t["task"] for t in ai_tasks], return_exceptions=True)
-        
-        for i, result in enumerate(ai_results):
-            article = ai_tasks[i]["article"]
-            
-            if isinstance(result, Exception):
-                logger.error(f"AI transformation failed for '{article.get('title')}': {result}")
-                continue
-                
-            try:
-                variant = SpookyVariant(
-                    variant_id=str(uuid.uuid4()),
-                    original_item=OriginalItem(
+        for article in articles[:limit]:
+            # Generate horror variants for each article
+            for _ in range(variant_count):
+                themes = user_preferences.get("preferred_horror_types") if user_preferences else None
+                ai_tasks.append({
+                    "article": article,
+                    "task": call_openrouter_api(
                         title=article.get("title", "Unknown"),
-                        summary=article.get("summary", ""),
-                        link=article.get("link", ""),
-                        published=article.get("published", datetime.now().isoformat())
-                    ),
-                    haunted_title=result.get("title", "🕷️ The Cursed Tale"),
-                    haunted_summary=result.get("content", ""),
-                    horror_themes=result.get("themes", ["supernatural"]),
-                    supernatural_explanation=result.get("explanation", ""),
-                    personalization_applied=bool(request.user_preferences),
-                    generation_timestamp=datetime.now().isoformat()
-                )
-                variants.append(variant.dict())
-            except Exception as e:
-                logger.error(f"Error creating variant object: {e}")
+                        content=article.get("summary", ""),
+                        intensity=intensity,
+                        themes=themes
+                    )
+                })
 
-        if not variants:
-            logger.warning("No variants were generated successfully")
-            raise HTTPException(
-                status_code=422,
-                detail="No horror variants could be generated. Check logs for API errors."
-            )
+    # Execute AI tasks concurrently
+    if not ai_tasks:
+        raise ValueError("No articles found in provided feeds")
+         
+    ai_results = await asyncio.gather(*[t["task"] for t in ai_tasks], return_exceptions=True)
+    
+    for i, result in enumerate(ai_results):
+        article = ai_tasks[i]["article"]
         
+        if isinstance(result, Exception):
+            logger.error(f"AI transformation failed for '{article.get('title')}': {result}")
+            continue
+            
+        try:
+            variant = {
+                "variant_id": str(uuid.uuid4()),
+                "original_item": {
+                    "title": article.get("title", "Unknown"),
+                    "summary": article.get("summary", ""),
+                    "link": article.get("link", ""),
+                    "published": article.get("published", datetime.now().isoformat())
+                },
+                "haunted_title": result.get("title", "🕷️ The Cursed Tale"),
+                "haunted_summary": result.get("content", ""),
+                "horror_themes": result.get("themes", ["supernatural"]),
+                "supernatural_explanation": result.get("explanation", ""),
+                "personalization_applied": bool(user_preferences),
+                "generation_timestamp": datetime.now().isoformat()
+            }
+            variants.append(variant)
+        except Exception as e:
+            logger.error(f"Error creating variant object: {e}")
+
+    if not variants:
+        raise ValueError("No horror variants could be generated. Check logs for API errors.")
+    
+    response = {
+        "success": True,
+        "message": f"Successfully processed {len(urls)} feeds",
+        "processing_id": processing_id,
+        "total_feeds": len(urls),
+        "total_variants": len(variants),
+        "processing_time": 0.0,
+        "variants": variants
+    }
+    
+    logger.info(f"Generated {len(variants)} variants from {len(urls)} feeds")
+    return response
+
+
+class handler(BaseHTTPRequestHandler):
+    """Vercel serverless function handler"""
+    
+    def _set_headers(self, status=200, content_type='application/json'):
+        """Set response headers"""
+        self.send_response(status)
+        self.send_header('Content-type', content_type)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+    
+    def do_OPTIONS(self):
+        """Handle CORS preflight"""
+        self._set_headers(200)
+        return
+    
+    def do_GET(self):
+        """Health check endpoint"""
+        self._set_headers(200)
         response = {
-            "success": True,
-            "message": f"Successfully processed {len(request.urls)} feeds",
-            "processing_id": processing_id,
-            "total_feeds": len(request.urls),
-            "total_variants": len(variants),
-            "processing_time": 0.0,
-            "variants": variants
+            "status": "ok",
+            "service": "feed-processing",
+            "openrouter_configured": bool(os.getenv("OPENROUTER_API_KEY"))
         }
-        
-        logger.info(f"Generated {len(variants)} variants from {len(request.urls)} feeds")
-        return response
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error processing feeds: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to process feeds: {str(e)}"
-        )
-
-
-# Create Mangum handler for Vercel
-handler = Mangum(app, lifespan="off")
+        self.wfile.write(json.dumps(response).encode('utf-8'))
+        return
+    
+    def do_POST(self):
+        """Process feeds endpoint"""
+        try:
+            # Read request body
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            request_data = json.loads(body.decode('utf-8'))
+            
+            # Process feeds asynchronously
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            result = loop.run_until_complete(process_feeds_async(request_data))
+            loop.close()
+            
+            # Send success response
+            self._set_headers(200)
+            self.wfile.write(json.dumps(result).encode('utf-8'))
+            
+        except ValueError as e:
+            # Client error (400)
+            self._set_headers(400)
+            error_response = {
+                "success": False,
+                "error": str(e),
+                "detail": str(e)
+            }
+            self.wfile.write(json.dumps(error_response).encode('utf-8'))
+            
+        except Exception as e:
+            # Server error (500)
+            logger.error(f"Error processing feeds: {str(e)}", exc_info=True)
+            self._set_headers(500)
+            error_response = {
+                "success": False,
+                "error": "Internal server error",
+                "detail": str(e)
+            }
+            self.wfile.write(json.dumps(error_response).encode('utf-8'))
