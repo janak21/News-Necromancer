@@ -329,8 +329,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const containerClasses = `audio-player ${className}`.trim();
 
   // Convert relative audio URL to absolute URL
+  // Support data URLs (base64), http URLs, and relative paths
   const absoluteAudioUrl = audioUrl 
-    ? (audioUrl.startsWith('http') ? audioUrl : `http://localhost:8000${audioUrl}`)
+    ? (audioUrl.startsWith('http') || audioUrl.startsWith('data:') 
+        ? audioUrl 
+        : `http://localhost:8000${audioUrl}`)
     : undefined;
 
   return (
