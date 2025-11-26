@@ -19,13 +19,14 @@ logger = logging.getLogger(__name__)
 
 
 # Voice style to ElevenLabs voice ID mapping
+# Using pre-made voices that should work with most API keys
 VOICE_STYLE_MAP = {
     "ethereal_whisper": "21m00Tcm4TlvDq8ikWAM",  # Rachel - soft, ethereal
     "gothic_narrator": "EXAVITQu4vr4xnSDxMaL",   # Bella - dramatic, gothic
     "sinister_storyteller": "VR6AewLTigWG4xSOukaG", # Arnold - deep, ominous
     "haunted_voice": "pNInz6obpgDQGcFmaJgB",     # Adam - haunting
     "cryptic_oracle": "yoZ06aMxZJJ28mfd3POQ",    # Sam - mysterious
-    "eerie_narrator": "21m00Tcm4TlvDq8ikWAM"     # Default fallback
+    "eerie_narrator": "pNInz6obpgDQGcFmaJgB"     # Default: Adam (haunting)
 }
 
 
@@ -41,7 +42,16 @@ async def generate_narration_async(request_data: dict) -> dict:
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not api_key:
         logger.error("ELEVENLABS_API_KEY not configured")
-        raise ValueError("ElevenLabs API key not configured")
+        raise ValueError("ElevenLabs API key not configured. Please set ELEVENLABS_API_KEY in Vercel environment variables.")
+    
+    # Validate API key format
+    if not api_key.startswith("sk_"):
+        logger.error(f"Invalid API key format: {api_key[:10]}...")
+        raise ValueError("Invalid ElevenLabs API key format. Key should start with 'sk_'")
+    
+    # Log key info (first/last 4 chars only for security)
+    key_preview = f"{api_key[:7]}...{api_key[-4:]}" if len(api_key) > 11 else "***"
+    logger.info(f"Using ElevenLabs API key: {key_preview}")
     
     # Get voice ID
     voice_id = VOICE_STYLE_MAP.get(voice_style, VOICE_STYLE_MAP["eerie_narrator"])
@@ -62,6 +72,8 @@ async def generate_narration_async(request_data: dict) -> dict:
         "Content-Type": "application/json",
         "xi-api-key": api_key
     }
+    
+    logger.info(f"Calling ElevenLabs API: {url}")
     
     # Adjust voice settings based on intensity
     stability = 0.3 + (intensity_level * 0.1)  # 0.4 to 0.8
@@ -112,14 +124,18 @@ async def generate_narration_async(request_data: dict) -> dict:
                 else:
                     error_text = await resp.text()
                     logger.error(f"ElevenLabs API error: {resp.status} - {error_text}")
+                    logger.error(f"Request URL: {url}")
+                    logger.error(f"Voice ID: {voice_id}")
                     
                     # Check for specific errors
                     if resp.status == 401:
-                        raise ValueError("Invalid ElevenLabs API key")
+                        raise ValueError(f"Invalid ElevenLabs API key. Status: {resp.status}, Response: {error_text[:200]}")
                     elif resp.status == 429:
                         raise ValueError("Rate limit exceeded. Please try again later.")
+                    elif resp.status == 404:
+                        raise ValueError(f"Voice ID not found: {voice_id}. Please check voice configuration.")
                     else:
-                        raise ValueError(f"ElevenLabs API error: {resp.status}")
+                        raise ValueError(f"ElevenLabs API error: {resp.status} - {error_text[:200]}")
                         
     except asyncio.TimeoutError:
         logger.error("Narration generation timed out")
