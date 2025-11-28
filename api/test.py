@@ -12,7 +12,7 @@ async def test():
     return {
         "status": "success",
         "message": "Vercel serverless function is working!",
-        "service": "GhostRevive API"
+        "service": "News Necromancer API"
     }
 
 @app.post("/")
@@ -20,7 +20,7 @@ async def test_post():
     return {
         "status": "success",
         "message": "POST endpoint working!",
-        "service": "GhostRevive API"
+        "service": "News Necromancer API"
     }
 
 # Create Mangum handler for Vercel

@@ -138,3 +138,7 @@ test_*.py
 model_examples.py
 python_compatibility.md
 .vercel
+
+# Archived documentation
+.archive/
+cleanup_docs.sh

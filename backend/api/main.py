@@ -42,7 +42,7 @@ async def lifespan(app: FastAPI):
     Handles initialization and cleanup of background services.
     """
     # Startup
-    logger.info("Starting Spooky RSS System API")
+    logger.info("Starting News Necromancer API")
     
     # Log configuration summary (with secrets redacted)
     config_summary = get_config_summary()
@@ -74,7 +74,7 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    logger.info("Shutting down Spooky RSS System API")
+    logger.info("Shutting down News Necromancer API")
     
     # Stop cleanup service
     if hasattr(app.state, 'cleanup_service') and app.state.cleanup_service:
@@ -95,7 +95,7 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI application with lifespan
 app = FastAPI(
-    title="Spooky RSS System API",
+    title="News Necromancer API",
     description="Transform RSS feeds into horror-themed content with AI",
     version="1.0.0",
     docs_url="/api/docs",
@@ -129,7 +129,7 @@ app.state.error_count = 0
 async def root():
     """Root endpoint with basic system information"""
     return {
-        "message": "🎃 Welcome to the Spooky RSS System API",
+        "message": "🎃 Welcome to the News Necromancer API",
         "version": "1.0.0",
         "docs": "/api/docs",
         "health": "/api/health"

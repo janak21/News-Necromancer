@@ -15,7 +15,7 @@ class handler(BaseHTTPRequestHandler):
         
         response = {
             "status": "healthy",
-            "service": "GhostRevive",
+            "service": "News Necromancer",
             "version": "1.0.0",
             "timestamp": datetime.now().isoformat(),
             "environment": "serverless"

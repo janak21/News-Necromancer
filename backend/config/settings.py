@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     """Application settings with environment variable support"""
     
     # API Configuration
-    api_title: str = "Spooky RSS System API"
+    api_title: str = "News Necromancer API"
     api_version: str = "1.0.0"
     api_description: str = "Transform RSS feeds into horror-themed content with AI"
     
