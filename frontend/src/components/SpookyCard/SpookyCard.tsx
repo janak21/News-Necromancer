@@ -81,7 +81,11 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
 
   // Get default voice style based on horror themes
   const getDefaultVoiceStyle = (): VoiceStyle => {
-    const themes = variant.horror_themes.map(t => t.toLowerCase());
+    const horrorThemes = Array.isArray(variant.horror_themes) 
+      ? variant.horror_themes 
+      : (typeof variant.horror_themes === 'string' ? [variant.horror_themes] : []);
+    
+    const themes = horrorThemes.map(t => t.toLowerCase());
     
     if (themes.some(t => t.includes('ghost') || t.includes('spirit'))) {
       return VoiceStyle.GHOSTLY_WHISPER;
@@ -195,14 +199,17 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
           </motion.div>
         )}
 
-        {showThemes && variant.horror_themes.length > 0 && (
+        {showThemes && Array.isArray(variant.horror_themes) && variant.horror_themes.length > 0 && (
           <motion.div 
             className="spooky-content-card__themes"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.4 }}
           >
-            {variant.horror_themes.map((theme, index) => (
+            {(Array.isArray(variant.horror_themes) 
+              ? variant.horror_themes 
+              : (typeof variant.horror_themes === 'string' ? [variant.horror_themes] : [])
+            ).map((theme, index) => (
               <motion.span 
                 key={index} 
                 className="spooky-content-card__theme-tag"
