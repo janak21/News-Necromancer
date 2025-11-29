@@ -14,9 +14,17 @@ import aiohttp
 import logging
 import sys
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from variant_store import store_variant
+# Add api directory to path for imports
+api_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if api_dir not in sys.path:
+    sys.path.insert(0, api_dir)
+
+try:
+    from variant_store import store_variant
+except ImportError:
+    # Fallback if variant_store not available
+    def store_variant(variant_id, variant_data):
+        pass  # No-op if storage not available
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

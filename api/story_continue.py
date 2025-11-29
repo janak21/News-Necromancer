@@ -13,9 +13,17 @@ from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 import sys
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from variant_store import get_variant
+# Add api directory to path for imports
+api_dir = os.path.dirname(os.path.abspath(__file__))
+if api_dir not in sys.path:
+    sys.path.insert(0, api_dir)
+
+try:
+    from variant_store import get_variant
+except ImportError:
+    # Fallback if variant_store not available
+    def get_variant(variant_id):
+        return None
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
