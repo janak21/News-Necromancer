@@ -38,7 +38,7 @@ VOICE_STYLE_CONFIGS = {
         }
     },
     VoiceStyle.DEMONIC_GROWL: {
-        "voice_id": "EXAVITQu4vr4xnSDxMaL",  # ElevenLabs voice ID (placeholder)
+        "voice_id": "wXvR48IpOq9HACltTmt7",  # ElevenLabs voice ID
         "name": "Demonic Growl",
         "description": "A deep, menacing growl from the depths of darkness",
         "base_stability": 0.4,
