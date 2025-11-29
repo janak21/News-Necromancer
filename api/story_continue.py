@@ -28,7 +28,11 @@ async def continue_story_async(variant_id: str, original_content: str, continuat
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         logger.error("OPENROUTER_API_KEY not configured")
-        raise ValueError("OpenRouter API key not configured")
+        raise ValueError("OpenRouter API key not configured. Please set OPENROUTER_API_KEY in Vercel environment variables.")
+    
+    if not original_content or len(original_content.strip()) < 10:
+        logger.error(f"Invalid content: '{original_content[:50]}'")
+        raise ValueError("Original content is too short or empty")
     
     logger.info(f"📖 Continuing story for variant: {variant_id}, length: {continuation_length}")
     
@@ -91,10 +95,14 @@ Return ONLY the continuation text, no JSON, no formatting.
                     raise ValueError(f"OpenRouter API error: {resp.status}")
                     
     except asyncio.TimeoutError:
+        logger.error("Story continuation timed out")
         raise ValueError("Story continuation timed out")
+    except aiohttp.ClientError as e:
+        logger.error(f"Network error calling OpenRouter: {str(e)}")
+        raise ValueError(f"Network error: {str(e)}")
     except Exception as e:
-        logger.error(f"Error continuing story: {str(e)}")
-        raise
+        logger.error(f"Error continuing story: {type(e).__name__}: {str(e)}", exc_info=True)
+        raise ValueError(f"Failed to continue story: {str(e)}")
 
 
 class handler(BaseHTTPRequestHandler):
@@ -158,22 +166,35 @@ class handler(BaseHTTPRequestHandler):
             
         except ValueError as e:
             # Client error (400)
-            logger.warning(f"Client error: {str(e)}")
+            error_msg = str(e)
+            logger.warning(f"Client error: {error_msg}")
             self._set_headers(400)
             error_response = {
                 "success": False,
-                "error": str(e),
+                "error": error_msg,
+                "detail": error_msg
+            }
+            self.wfile.write(json.dumps(error_response).encode('utf-8'))
+            
+        except json.JSONDecodeError as e:
+            # Invalid JSON (400)
+            logger.error(f"Invalid JSON in request: {str(e)}")
+            self._set_headers(400)
+            error_response = {
+                "success": False,
+                "error": "Invalid JSON in request body",
                 "detail": str(e)
             }
             self.wfile.write(json.dumps(error_response).encode('utf-8'))
             
         except Exception as e:
             # Server error (500)
-            logger.error(f"Error continuing story: {str(e)}", exc_info=True)
+            error_msg = f"{type(e).__name__}: {str(e)}"
+            logger.error(f"Error continuing story: {error_msg}", exc_info=True)
             self._set_headers(500)
             error_response = {
                 "success": False,
                 "error": "Internal server error",
-                "detail": str(e)
+                "detail": error_msg
             }
             self.wfile.write(json.dumps(error_response).encode('utf-8'))
