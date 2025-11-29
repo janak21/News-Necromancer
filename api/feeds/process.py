@@ -51,11 +51,19 @@ def generate_mock_horror(title: str, content: str, intensity: int, themes: list 
     
     themes_list = themes or ["supernatural forces", "dark omens", "ghostly apparitions"]
     
+    explanations = [
+        f"I sense {themes_list[0]} at work here... The veil between worlds grows thin.",
+        f"Dark forces whisper of {themes_list[0]}. Something ancient stirs in the shadows.",
+        f"The spirits speak of {themes_list[0]}. This is no mere coincidence.",
+        f"An otherworldly presence manifests through {themes_list[0]}. Beware what lurks beyond.",
+        f"The supernatural realm bleeds into ours, bringing {themes_list[0]} with it."
+    ]
+    
     return {
         "title": f"{random.choice(horror_prefixes)} {title[:50]}",
         "content": random.choice(horror_templates).format(content=content[:100]),
         "themes": themes_list[:3],
-        "explanation": f"Mysterious {', '.join(themes_list[:2])} manifest in this tale of supernatural horror."
+        "explanation": random.choice(explanations)
     }
 
 
@@ -122,12 +130,20 @@ Original Title: {title}
 Original Content: {content}
 
 Create a spooky variant with:
-1. A haunting title (include horror emoji)
-2. A twisted, supernatural version of the story
+1. A haunting title (include horror emoji like 👻🕷️💀🌙)
+2. A twisted, supernatural version of the story (2-3 sentences)
 3. Maintain the original facts but frame them as horror/supernatural
-4. Keep it 2-3 sentences
+4. An immersive explanation from a narrator's perspective (not meta-commentary)
 
-Return as JSON with keys: "title", "content", "themes", "explanation"
+Return ONLY valid JSON with these exact keys:
+{{
+  "title": "horror title with emoji",
+  "content": "the haunted story",
+  "themes": ["theme1", "theme2"],
+  "explanation": "A chilling first-person or narrator perspective on what dark forces are at work here..."
+}}
+
+The explanation should be immersive horror narration, NOT analysis of the transformation.
 """
     
     headers = {
