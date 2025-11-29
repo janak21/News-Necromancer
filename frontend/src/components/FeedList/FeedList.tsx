@@ -52,7 +52,12 @@ const FeedList: React.FC<FeedListProps> = ({
     const themes = new Set<string>();
     feeds.forEach(feed => {
       feed.variants.forEach(variant => {
-        variant.horror_themes?.forEach(theme => themes.add(theme));
+        const horrorThemes = variant.horror_themes;
+        if (Array.isArray(horrorThemes)) {
+          horrorThemes.forEach(theme => themes.add(theme));
+        } else if (typeof horrorThemes === 'string') {
+          themes.add(horrorThemes);
+        }
       });
     });
     return Array.from(themes).sort();

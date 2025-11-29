@@ -238,6 +238,14 @@ async def process_feeds_async(request_data: dict) -> dict:
             
         try:
             variant_id = str(uuid.uuid4())
+            
+            # Ensure horror_themes is always an array
+            themes = result.get("themes", ["supernatural"])
+            if isinstance(themes, str):
+                themes = [themes]
+            elif not isinstance(themes, list):
+                themes = ["supernatural"]
+            
             variant = {
                 "variant_id": variant_id,
                 "original_item": {
@@ -248,7 +256,7 @@ async def process_feeds_async(request_data: dict) -> dict:
                 },
                 "haunted_title": result.get("title", "🕷️ The Cursed Tale"),
                 "haunted_summary": result.get("content", ""),
-                "horror_themes": result.get("themes", ["supernatural"]),
+                "horror_themes": themes,
                 "supernatural_explanation": result.get("explanation", ""),
                 "personalization_applied": bool(user_preferences),
                 "generation_timestamp": datetime.now().isoformat()
