@@ -333,7 +333,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const absoluteAudioUrl = audioUrl 
     ? (audioUrl.startsWith('http') || audioUrl.startsWith('data:') 
         ? audioUrl 
-        : `http://localhost:8000${audioUrl}`)
+        : `${window.location.origin}${audioUrl}`)
     : undefined;
 
   return (

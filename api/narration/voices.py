@@ -1,73 +1,95 @@
 """
 Voice styles listing serverless function for Vercel deployment.
-
-This endpoint provides information about available voice styles.
 """
 
-from mangum import Mangum
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
+from http.server import BaseHTTPRequestHandler
+import json
 import logging
 
-# Configure logging for serverless
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app for voice listing
-app = FastAPI()
+# Voice styles configuration
+VOICE_STYLES = [
+    {
+        "id": "ethereal_whisper",
+        "name": "Ethereal Whisper",
+        "description": "Soft, ghostly voice that sends chills down your spine",
+        "preview_url": "/api/narration/preview/ethereal_whisper",
+        "icon": "👻",
+        "recommended_intensity": 2
+    },
+    {
+        "id": "gothic_narrator",
+        "name": "Gothic Narrator",
+        "description": "Dramatic, theatrical voice perfect for dark tales",
+        "preview_url": "/api/narration/preview/gothic_narrator",
+        "icon": "🦇",
+        "recommended_intensity": 3
+    },
+    {
+        "id": "sinister_storyteller",
+        "name": "Sinister Storyteller",
+        "description": "Deep, ominous voice that speaks of ancient evils",
+        "preview_url": "/api/narration/preview/sinister_storyteller",
+        "icon": "💀",
+        "recommended_intensity": 4
+    },
+    {
+        "id": "haunted_voice",
+        "name": "Haunted Voice",
+        "description": "Eerie, unsettling voice from beyond the grave",
+        "preview_url": "/api/narration/preview/haunted_voice",
+        "icon": "🕷️",
+        "recommended_intensity": 3
+    },
+    {
+        "id": "cryptic_oracle",
+        "name": "Cryptic Oracle",
+        "description": "Mysterious voice that reveals dark prophecies",
+        "preview_url": "/api/narration/preview/cryptic_oracle",
+        "icon": "🔮",
+        "recommended_intensity": 3
+    },
+    {
+        "id": "eerie_narrator",
+        "name": "Eerie Narrator",
+        "description": "Classic horror narrator with haunting delivery",
+        "preview_url": "/api/narration/preview/eerie_narrator",
+        "icon": "🌙",
+        "recommended_intensity": 3
+    }
+]
 
 
-# Models
-class VoiceStyleInfo(BaseModel):
-    """Information about a voice style"""
-    id: str
-    name: str
-    description: str
-    preview_url: str
-    icon: str
-    recommended_intensity: int
-
-
-@app.get("/api/narration/voices", response_model=List[VoiceStyleInfo])
-async def list_voice_styles():
-    """
-    List available voice styles with preview information.
+class handler(BaseHTTPRequestHandler):
+    """Vercel serverless function handler for voice styles"""
     
-    Returns information about all available horror voice styles including
-    descriptions, preview URLs, and recommended intensity levels.
+    def _set_headers(self, status=200, content_type='application/json'):
+        """Set response headers"""
+        self.send_response(status)
+        self.send_header('Content-type', content_type)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
     
-    Returns:
-        List of voice style information objects
-    """
-    try:
-        # Import backend modules (lazy import for faster cold starts)
-        from backend.narration.voice_configs import VOICE_STYLE_CONFIGS
-        
-        voice_styles = []
-        
-        for voice_style, config in VOICE_STYLE_CONFIGS.items():
-            voice_info = VoiceStyleInfo(
-                id=voice_style.value,
-                name=config["name"],
-                description=config["description"],
-                preview_url=config.get("preview_url", f"/api/narration/preview/{voice_style.value}"),
-                icon=config.get("icon", "🎭"),
-                recommended_intensity=config.get("recommended_intensity", 3)
-            )
-            voice_styles.append(voice_info)
-        
-        logger.info(f"📋 Returning {len(voice_styles)} voice styles")
-        
-        return voice_styles
-        
-    except Exception as e:
-        logger.error(f"💀 Error listing voice styles: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to list voice styles: {str(e)}"
-        )
-
-
-# Create Mangum handler for Vercel
-handler = Mangum(app, lifespan="off")
+    def do_OPTIONS(self):
+        """Handle CORS preflight"""
+        self._set_headers(200)
+        return
+    
+    def do_GET(self):
+        """List available voice styles"""
+        try:
+            self._set_headers(200)
+            self.wfile.write(json.dumps(VOICE_STYLES).encode('utf-8'))
+            logger.info(f"📋 Returned {len(VOICE_STYLES)} voice styles")
+        except Exception as e:
+            logger.error(f"Error listing voice styles: {str(e)}")
+            self._set_headers(500)
+            error_response = {
+                "error": "Internal server error",
+                "detail": str(e)
+            }
+            self.wfile.write(json.dumps(error_response).encode('utf-8'))

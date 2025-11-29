@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from contextlib import asynccontextmanager
 
-from .routes import feeds, health, preferences, narration
+from .routes import feeds, health, preferences, narration, story_continue
 from .middleware import setup_middleware
 from backend.config import (
     validate_configuration,
@@ -111,6 +111,7 @@ app.include_router(feeds.router, prefix="/api/feeds", tags=["feeds"])
 app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(preferences.router, prefix="/api/preferences", tags=["preferences"])
 app.include_router(narration.router, prefix="/api/narration", tags=["narration"])
+app.include_router(story_continue.router, prefix="/api", tags=["story_continue"])
 
 # Add direct variant endpoint to match task specification
 from .routes.feeds import get_spooky_variants

@@ -12,10 +12,43 @@ import feedparser
 from datetime import datetime
 import aiohttp
 import logging
+import sys
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from variant_store import store_variant
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def generate_mock_horror(title: str, content: str, intensity: int, themes: list = None) -> dict:
+    """Generate mock horror content for testing without API"""
+    import random
+    
+    horror_prefixes = [
+        "🕷️ The Cursed Tale of",
+        "👻 The Haunting of", 
+        "🌙 The Dark Mystery of",
+        "💀 The Nightmare of",
+        "🔮 The Supernatural Case of"
+    ]
+    
+    horror_templates = [
+        "Ancient forces stir in the shadows as {content}. Witnesses report ghostly apparitions and unexplained phenomena surrounding these events. The boundary between our world and the spirit realm grows dangerously thin.",
+        "Dark omens foretell doom as {content}. Supernatural entities have been sighted, their malevolent presence felt by all who dare approach. Reality itself seems to bend under their otherworldly influence.",
+        "A curse awakens as {content}. Those involved speak of eerie sensations and spectral warnings. The veil between life and death has been torn, allowing ancient horrors to seep through."
+    ]
+    
+    themes_list = themes or ["supernatural forces", "dark omens", "ghostly apparitions"]
+    
+    return {
+        "title": f"{random.choice(horror_prefixes)} {title[:50]}",
+        "content": random.choice(horror_templates).format(content=content[:100]),
+        "themes": themes_list[:3],
+        "explanation": f"Mysterious {', '.join(themes_list[:2])} manifest in this tale of supernatural horror."
+    }
 
 
 async def fetch_rss_feed(url: str, timeout: int = 4) -> dict:
@@ -59,6 +92,13 @@ async def fetch_rss_feed(url: str, timeout: int = 4) -> dict:
 
 async def call_openrouter_api(title: str, content: str, intensity: int, themes: list = None) -> dict:
     """Call OpenRouter API to transform content into horror story"""
+    
+    # Check if mock mode is enabled
+    use_mock = os.getenv("USE_MOCK_API", "false").lower() == "true"
+    if use_mock:
+        logger.info("Using MOCK API mode for testing")
+        return generate_mock_horror(title, content, intensity, themes)
+    
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         logger.error("OPENROUTER_API_KEY environment variable is missing")
@@ -85,7 +125,8 @@ Return as JSON with keys: "title", "content", "themes", "explanation"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://news-necromancer.vercel.app"
+        "HTTP-Referer": os.getenv("HTTP_REFERER", "http://localhost:5173"),
+        "X-Title": "News Necromancer"
     }
     
     payload = {
@@ -196,8 +237,9 @@ async def process_feeds_async(request_data: dict) -> dict:
             continue
             
         try:
+            variant_id = str(uuid.uuid4())
             variant = {
-                "variant_id": str(uuid.uuid4()),
+                "variant_id": variant_id,
                 "original_item": {
                     "title": article.get("title", "Unknown"),
                     "summary": article.get("summary", ""),
@@ -211,6 +253,10 @@ async def process_feeds_async(request_data: dict) -> dict:
                 "personalization_applied": bool(user_preferences),
                 "generation_timestamp": datetime.now().isoformat()
             }
+            
+            # Store variant for later retrieval (story continuation)
+            store_variant(variant_id, variant)
+            
             variants.append(variant)
         except Exception as e:
             logger.error(f"Error creating variant object: {e}")

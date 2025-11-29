@@ -3,7 +3,10 @@ import { StorageService } from './storage';
 import type { SpookyVariant, UserPreferences, ProcessingStats, StoryContinuation } from '../types';
 import type { NarrationRequest, NarrationStatus, VoiceStyleInfo } from '../types/narration';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+// Use relative path for Vercel deployment, falls back to localhost for local dev
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
+  import.meta.env.PROD ? '/api' : 'http://localhost:8000/api'
+);
 
 export class ApiService {
   private static async request<T>(

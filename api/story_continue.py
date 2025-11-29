@@ -11,6 +11,11 @@ import aiohttp
 import logging
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
+import sys
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from variant_store import get_variant
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -46,7 +51,8 @@ Return ONLY the continuation text, no JSON, no formatting.
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://news-necromancer.vercel.app"
+        "HTTP-Referer": os.getenv("HTTP_REFERER", "http://localhost:5173"),
+        "X-Title": "News Necromancer"
     }
     
     payload = {
@@ -127,8 +133,16 @@ class handler(BaseHTTPRequestHandler):
             if not variant_id:
                 raise ValueError("Variant ID is required")
             
+            # Try to get variant from store
+            stored_variant = get_variant(variant_id)
+            if stored_variant:
+                logger.info(f"Found variant {variant_id} in store")
+                # Use stored content if no content provided
+                if not original_content:
+                    original_content = stored_variant.get('haunted_summary', '')
+            
             if not original_content:
-                raise ValueError("Original story content is required")
+                raise ValueError("Original story content is required and variant not found in store")
             
             # Continue story asynchronously
             loop = asyncio.new_event_loop()

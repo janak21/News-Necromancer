@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FeedList, Button, ErrorBoundary } from '../components';
+import { FeedList, Button, ErrorBoundary, ProcessingProgress } from '../components';
 import { ApiService } from '../services/api';
 import { useFeedPersistence } from '../hooks/useFeedPersistence';
 import { useGhostNotificationContext } from '../contexts/GhostNotificationContext';
@@ -290,24 +290,10 @@ const FeedsPage: React.FC = () => {
         </motion.div>
 
         {/* Processing Status */}
-        {isProcessing && processingId && (
-          <motion.div
-            style={{
-              background: 'rgba(75, 0, 130, 0.2)',
-              border: '1px solid rgba(75, 0, 130, 0.4)',
-              borderRadius: '8px',
-              padding: 'var(--spacing-md)',
-              marginBottom: 'var(--spacing-lg)',
-              textAlign: 'center'
-            }}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <p style={{ color: 'var(--color-primary)', margin: 0 }}>
-              🌀 Processing ID: {processingId} - The spirits are weaving dark magic...
-            </p>
-          </motion.div>
-        )}
+        <ProcessingProgress 
+          isProcessing={isProcessing} 
+          processingId={processingId} 
+        />
         
         {/* Feed List */}
         <motion.div

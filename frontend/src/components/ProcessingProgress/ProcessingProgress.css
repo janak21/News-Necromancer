@@ -1,0 +1,211 @@
+.processing-progress {
+  background: linear-gradient(
+    135deg,
+    rgba(75, 0, 130, 0.2) 0%,
+    rgba(138, 43, 226, 0.15) 100%
+  );
+  border: 1px solid rgba(138, 43, 226, 0.4);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(138, 43, 226, 0.2);
+}
+
+.processing-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(138, 43, 226, 0.1),
+    transparent
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.processing-progress__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.processing-progress__spinner {
+  margin-bottom: var(--spacing-sm);
+}
+
+.processing-progress__steps {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.processing-progress__step {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.processing-progress__icon {
+  font-size: 1.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.processing-progress__message {
+  text-align: center;
+}
+
+.processing-progress__bar-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(20, 20, 30, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.processing-progress__bar {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 50%,
+    var(--color-primary) 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-shift 2s ease-in-out infinite;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.processing-progress__bar-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(138, 43, 226, 0.4),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.processing-progress__id {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.processing-progress__id-label {
+  font-weight: var(--font-weight-medium);
+}
+
+.processing-progress__id-value {
+  font-family: 'Courier New', monospace;
+  background: rgba(138, 43, 226, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: var(--color-primary);
+  font-size: 0.875rem;
+}
+
+.processing-progress__particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.processing-progress__particle {
+  position: absolute;
+  bottom: 0;
+  width: 4px;
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .processing-progress {
+    padding: var(--spacing-md);
+  }
+
+  .processing-progress__step {
+    font-size: var(--font-size-sm);
+  }
+
+  .processing-progress__icon {
+    font-size: 1.25rem;
+  }
+
+  .processing-progress__message {
+    font-size: 0.875rem;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .processing-progress::before,
+  .processing-progress__bar,
+  .processing-progress__bar-glow,
+  .processing-progress__particle {
+    animation: none;
+  }
+
+  .processing-progress__icon {
+    animation: none;
+  }
+}

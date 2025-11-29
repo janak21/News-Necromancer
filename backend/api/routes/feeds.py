@@ -82,6 +82,12 @@ async def process_feeds(
         # Convert variants to dictionaries for JSON response
         variant_dicts = [variant.to_dict() for variant in response.variants]
         
+        # Store variants for story continuation
+        from .story_continue import store_variant
+        for variant in response.variants:
+            variant_dict = variant.to_dict()
+            store_variant(variant_dict['variant_id'], variant_dict)
+        
         return FeedProcessingResponse(
             success=response.success,
             message=response.message,

@@ -346,3 +346,46 @@
     - Validate feature toggles and preference persistence
     - Test performance under realistic usage scenarios
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 7.1, 8.1, 9.1, 10.1_
+
+- [ ] 16. Fix feed processing display and async feedback issues
+  - [ ] 16.1 Debug and fix feed processing response handling
+    - Add comprehensive logging to feed processing endpoint
+    - Verify response structure matches frontend expectations
+    - Test with real RSS feeds (Forbes, TechCrunch, etc.)
+    - Ensure variant_id is generated for all variants
+    - _Requirements: 11.1, 11.4_
+
+  - [ ] 16.2 Fix frontend state management for processed variants
+    - Update FeedsPage to correctly handle processFeeds response
+    - Ensure variants state is updated after successful processing
+    - Add console logging for debugging response structure
+    - Handle edge cases (empty variants, malformed responses)
+    - _Requirements: 11.1, 11.3_
+
+  - [ ] 16.3 Implement proper storage persistence for variants
+    - Create or update StorageService.saveVariants method
+    - Implement deduplication logic for variant_id
+    - Add StorageService.getVariants for retrieval
+    - Test persistence across page refreshes
+    - _Requirements: 11.2_
+
+  - [ ] 16.4 Enhance async operation feedback notifications
+    - Add detailed success notifications with variant count
+    - Implement processing duration display
+    - Add specific error messages for different failure scenarios
+    - Show warning when processing succeeds but generates no variants
+    - _Requirements: 12.1, 12.2, 12.3, 12.5_
+
+  - [ ] 16.5 Add comprehensive error handling and logging
+    - Log all API responses to console for debugging
+    - Add try-catch blocks around critical operations
+    - Implement graceful degradation for storage failures
+    - Add user-friendly error messages for common issues
+    - _Requirements: 12.3, 12.4_
+
+  - [ ]* 16.6 Write tests for bug fixes
+    - Test feed processing response handling with various formats
+    - Test state updates and storage persistence
+    - Test notification display for success/error/warning scenarios
+    - Test edge cases (empty responses, network errors, invalid feeds)
+    - _Requirements: 11.1, 11.2, 11.3, 12.1, 12.2, 12.3_

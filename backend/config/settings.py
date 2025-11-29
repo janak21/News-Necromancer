@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     openrouter_api_key: Optional[str] = None
     openrouter_model: str = "gpt-3.5-turbo"
     openrouter_app_name: str = "spooky-rss-system"
+    use_mock_api: bool = False  # Use mock API for testing without OpenRouter
     
     # ElevenLabs/TTS Configuration
     elevenlabs_api_key: Optional[str] = None

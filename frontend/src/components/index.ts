@@ -37,6 +37,7 @@ export { default as IntensitySlider } from './IntensitySlider';
 export { default as SpookySpinner } from './SpookySpinner';
 export { default as SkeletonLoader, SkeletonCard, SkeletonFeedList } from './SkeletonLoader';
 export { default as LoadingState } from './LoadingState';
+export { default as ProcessingProgress } from './ProcessingProgress';
 
 // Narration Components
 export { default as VoiceStyleSelector } from './VoiceStyleSelector';
