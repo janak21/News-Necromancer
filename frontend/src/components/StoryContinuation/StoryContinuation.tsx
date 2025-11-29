@@ -17,9 +17,6 @@ const StoryContinuation: React.FC<StoryContinuationProps> = ({
   variant,
   onContinue
 }) => {
-  // Check if story continuation is enabled
-  const isEnabled = import.meta.env.VITE_ENABLE_STORY_CONTINUATION !== 'false';
-  
   const [isLoading, setIsLoading] = useState(false);
   const [continuation, setContinuation] = useState<StoryContinuationType | null>(
     variant.continuation || null
@@ -30,11 +27,6 @@ const StoryContinuation: React.FC<StoryContinuationProps> = ({
   const [retryCount, setRetryCount] = useState(0);
   const [retryDelay, setRetryDelay] = useState(0);
   const { playSound } = useSoundEffects();
-  
-  // Don't render if feature is disabled
-  if (!isEnabled) {
-    return null;
-  }
 
   // Format narrative text with proper spacing
   const formatNarrativeText = (text: string): string => {

@@ -19,14 +19,20 @@ logger = logging.getLogger(__name__)
 
 
 # Voice style to ElevenLabs voice ID mapping
-# Using pre-made voices that should work with most API keys
+# Matches backend/narration/voice_configs.py
 VOICE_STYLE_MAP = {
-    "ethereal_whisper": "21m00Tcm4TlvDq8ikWAM",  # Rachel - soft, ethereal
-    "gothic_narrator": "EXAVITQu4vr4xnSDxMaL",   # Bella - dramatic, gothic
-    "sinister_storyteller": "VR6AewLTigWG4xSOukaG", # Arnold - deep, ominous
-    "haunted_voice": "pNInz6obpgDQGcFmaJgB",     # Adam - haunting
-    "cryptic_oracle": "yoZ06aMxZJJ28mfd3POQ",    # Sam - mysterious
-    "eerie_narrator": "pNInz6obpgDQGcFmaJgB"     # Default: Adam (haunting)
+    "ghostly_whisper": "21m00Tcm4TlvDq8ikWAM",  # Rachel - ethereal whisper
+    "demonic_growl": "EXAVITQu4vr4xnSDxMaL",     # Bella - demonic growl
+    "eerie_narrator": "pNInz6obpgDQGcFmaJgB",    # Adam - eerie narrator
+    "possessed_child": "jBpfuIE2acCO8z3wKNLl",   # Gigi - possessed child
+    "ancient_entity": "onwK4e9ZLuTAKqWW03F9",    # Daniel - Ancient Entity (Attenborough-like)
+    
+    # Legacy mappings for compatibility
+    "ethereal_whisper": "21m00Tcm4TlvDq8ikWAM",
+    "gothic_narrator": "EXAVITQu4vr4xnSDxMaL",
+    "sinister_storyteller": "onwK4e9ZLuTAKqWW03F9",
+    "haunted_voice": "pNInz6obpgDQGcFmaJgB",
+    "cryptic_oracle": "pNInz6obpgDQGcFmaJgB"
 }
 
 
@@ -62,7 +68,7 @@ async def generate_narration_async(request_data: dict) -> dict:
         content = content[:max_length] + "..."
         logger.warning(f"Content truncated to {max_length} characters")
     
-    logger.info(f"🎙️ Generating narration: voice={voice_style}, length={len(content)}")
+    logger.info(f"🎙️ Generating narration: voice_style={voice_style}, voice_id={voice_id}, intensity={intensity_level}, length={len(content)}")
     
     # ElevenLabs API endpoint
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
@@ -75,19 +81,35 @@ async def generate_narration_async(request_data: dict) -> dict:
     
     logger.info(f"Calling ElevenLabs API: {url}")
     
-    # Adjust voice settings based on intensity
-    # Note: Free tier has limitations on voice settings
-    stability = 0.3 + (intensity_level * 0.1)  # 0.4 to 0.8
-    similarity_boost = 0.5 + (intensity_level * 0.05)  # 0.55 to 0.75
+    # Adjust voice settings based on intensity and voice style
+    # Base settings vary by voice style for better character
+    base_settings = {
+        "ghostly_whisper": {"stability": 0.3, "similarity_boost": 0.8, "style": 0.6},
+        "demonic_growl": {"stability": 0.4, "similarity_boost": 0.7, "style": 0.8},
+        "eerie_narrator": {"stability": 0.6, "similarity_boost": 0.75, "style": 0.5},
+        "possessed_child": {"stability": 0.2, "similarity_boost": 0.85, "style": 0.7},
+        "ancient_entity": {"stability": 0.65, "similarity_boost": 0.75, "style": 0.5}
+    }
     
-    # Use the free tier model (eleven_turbo_v2 or eleven_turbo_v2_5)
-    # Free tier models: eleven_turbo_v2, eleven_turbo_v2_5
+    settings = base_settings.get(voice_style, {"stability": 0.5, "similarity_boost": 0.75, "style": 0.5})
+    
+    # Adjust based on intensity (1-5)
+    intensity_factor = (intensity_level - 3) * 0.1  # -0.2 to +0.2
+    stability = max(0.0, min(1.0, settings["stability"] + intensity_factor))
+    similarity_boost = max(0.0, min(1.0, settings["similarity_boost"]))
+    style = max(0.0, min(1.0, settings["style"] + intensity_factor))
+    
+    logger.info(f"Voice settings: stability={stability:.2f}, similarity_boost={similarity_boost:.2f}, style={style:.2f}")
+    
+    # Use the free tier model (eleven_turbo_v2_5)
     payload = {
         "text": content,
-        "model_id": "eleven_turbo_v2_5",  # Free tier compatible model
+        "model_id": "eleven_turbo_v2_5",
         "voice_settings": {
-            "stability": min(stability, 1.0),
-            "similarity_boost": min(similarity_boost, 1.0)
+            "stability": stability,
+            "similarity_boost": similarity_boost,
+            "style": style,
+            "use_speaker_boost": True
         }
     }
     
