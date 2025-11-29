@@ -18,7 +18,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
     fog_intensity: 'medium',
   },
   voice_settings: {
-    preferred_voice_style: 'eerie_narrator',
+    preferred_voice_style: 'demonic_growl',
     auto_match_intensity: true,
   },
 };

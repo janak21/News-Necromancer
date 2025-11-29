@@ -79,29 +79,9 @@ const SpookyCard: React.FC<SpookyCardProps> = ({
     }
   };
 
-  // Get default voice style based on horror themes
+  // Get default voice style - always use Demonic Growl
   const getDefaultVoiceStyle = (): VoiceStyle => {
-    const horrorThemes = Array.isArray(variant.horror_themes) 
-      ? variant.horror_themes 
-      : (typeof variant.horror_themes === 'string' ? [variant.horror_themes] : []);
-    
-    const themes = horrorThemes.map(t => t.toLowerCase());
-    
-    if (themes.some(t => t.includes('ghost') || t.includes('spirit'))) {
-      return VoiceStyle.GHOSTLY_WHISPER;
-    }
-    if (themes.some(t => t.includes('demon') || t.includes('evil'))) {
-      return VoiceStyle.DEMONIC_GROWL;
-    }
-    if (themes.some(t => t.includes('child') || t.includes('innocent'))) {
-      return VoiceStyle.POSSESSED_CHILD;
-    }
-    if (themes.some(t => t.includes('ancient') || t.includes('old') || t.includes('elder'))) {
-      return VoiceStyle.ANCIENT_ENTITY;
-    }
-    
-    // Default to eerie narrator
-    return VoiceStyle.EERIE_NARRATOR;
+    return VoiceStyle.DEMONIC_GROWL;
   };
 
   // Get intensity level (default to 3 if not available)
